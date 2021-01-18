@@ -1,7 +1,6 @@
 # baseline
 Baseline version of Multi-Resolution HEALPix (MRH). This version was implemented as part of the Computer Science Dissertation, "Multi-Resolution Data Structures for Spherically Mapped Point Data". 2017.
 
-
 Dissertation Abstract:
 
 Data describing entities or objects whose locations may be treated as points on the surface of a sphere are said to be spherically mapped. A number of data structures specifically designed to store and access spherically mapped data have been developed. One of them, Hierarchical Equal Area iso-Latitude Pixelization (HEALPix), has been successfully used for numerous applications, notably including organizing and analyzing cosmic microwave background data. However, for applications involving relatively sparse spherically mapped point datasets, HEALPix has some drawbacks, including inefficient memory requirements due to fixed resolution, overwriting of data for closely proximate points, and return of spurious points in response to certain queries.
