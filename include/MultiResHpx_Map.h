@@ -17,7 +17,7 @@ template<typename T> class MultiResHpx_Map: public MultiResHpx
   public:
     /*! Constructs an unallocated map. */
 	  MultiResHpx_Map () 
-		  : MultiResHpx(MAX_HPX_ORDER64,scheme) {numrec = 0; scheme = NEST; map.clear(); }
+		  : MultiResHpx(MAX_HPX_ORDER64,scheme) {numrec = 0; Healpix_Ordering_Scheme scheme = NEST; map.clear(); }
 
     /*! Constructs a map with a given \a order ordering
         scheme \a scheme and \a overwrite overwrite node permission */
