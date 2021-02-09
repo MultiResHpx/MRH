@@ -33,9 +33,6 @@ public:
     HasId(int64 morton,int sub) : _morton(morton),_sub(sub) {}
     bool operator()(const MortonNode & o) const {
         return ( o.morton == _morton && o.sub == _sub );
-    //HasId(int morton) : _morton(morton) {}
-    //bool operator()(const MortonNode & o) const {
-    //    return o.morton == _morton;
     }
 };
 
@@ -255,14 +252,14 @@ int64 MortonLQT::HpxToMorton(int64 hpxid,int order)
 	int64 mask = 0;
 	int64 nextBit = 0;
 	// Process the 2-bit groups
-	mask = 3 << ((2*order)-2); // operator.lshift(3,(2*order)-2)
+	mask = 3 << ((2*order)-2); 
 	for(int i = order; i > 0; i--)  
 	{
 	  if(VERBOSE) cout << "  mask #" << i <<": " << mask << endl;
-	  nextBit = ((hpxid & mask) >> ((2*i)-2) ) + 1; //operator.rshift(operator.and_(hpxid,mask),2*i - 2 ) + 1 
+	  nextBit = ((hpxid & mask) >> ((2*i)-2) ) + 1; 
 	  if(VERBOSE)  cout << "     value: " << nextBit << endl;
 	  morton = AppendMortonBit(morton,nextBit);
-	  mask = mask >> 2; //operator.rshift(mask,2) 
+	  mask = mask >> 2; 
 	}
 	return morton;	
 }
@@ -281,7 +278,7 @@ void MortonLQT::MortonToHpx(int64 morton,int64& hpxid, int& order)
 	{
 	  nextBit = GetMortonBit(morton,order-i)-1;
 	  if(VERBOSE) cout << "  Morton digit #" << i << ": " << nextBit << endl;
-	  nextBit = nextBit << shift; //operator.lshift(nextBit,shift)
+	  nextBit = nextBit << shift; 
 	  if(VERBOSE) cout << "  after shift: " << nextBit << endl;
 	  hpxid += nextBit;  
 	  if(VERBOSE) cout << "hpxid " << hpxid << endl;
@@ -347,12 +344,6 @@ std::vector<int64> MortonLQT::ClosestMortonToLongLat(std::vector<MortonNode> Nod
 
 
 
-//unsigned int MortonLQT::GetNumPackedMortonNodes()
-//{
-//  return( pmTree.size() );
-//}
-
-
 unsigned int MortonLQT::GetNumMortonNodes()
 {
   return( mTree.size() );
@@ -384,13 +375,6 @@ void MortonLQT::PrintMortonTree()
      cout << "======================================================" << endl;
      for(unsigned int i = 0; i < GetNumMortonNodes(); i++)
 	 {
-   //      printf("%d: %ll %d %d %5.12f %5.12f %d\n",i,
-			//tree[i].morton,
-			//tree[i].sub,
-			//tree[i].childrenYN,
-			//tree[i].longitude,
-			//tree[i].latitude,
-			//tree[i].data);
 		   cout << i << " "
 				  << mTree[i].morton << " "
 				  << mTree[i].sub << " "
@@ -415,12 +399,6 @@ int MortonLQT::FindIndexAtMortonSub(int64 morton,int sub)
 {
   return( FindIndexAtMortonSub_internal(morton,sub) );
 }
-
-//int FindIndexAtMortonSub_internal(std::vector<MortonNode> sTree, int sMorton, int sSub)
-//{
-//   vector<MortonNode>::iterator it = std::find_if(sTree.begin(), sTree.end(), HasId<MortonNode>(sMorton,sSub));
-//   return it->morton;
-//}
 
 // Simple Linear Search of sTree vector until matching Morton,Sub combination is found. Returns index of sTree where
 // match occured. If no match is found return -1.
@@ -653,7 +631,6 @@ void MortonLQT::AppendNode(MortonNode node)
 	}
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton);
-	//self.tree = sorted( self.tree, key=operator.attrgetter('morton') );      
 }
 
 void MortonLQT::AddNode(MortonNode node)

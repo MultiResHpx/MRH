@@ -354,16 +354,6 @@ bool IsMapIndexInList
 	// Do Linear search if list size is relatively "small", quicker
 	// than binary search for "small" lists. Otherwise, do binary search
 	// for larger lists.
-	////DEBUG
-	//cout << "Current List: " << endl;
-	//for(unsigned int i = 0; i < list.size(); i++) {
-	//	//PrintMorton(list[i].m); cout << " ";
-	//	cout << list[i].data[0] << " ";
-	//}
-	//cout << endl;
-	////cout << "Looking for: "; PrintMorton(node.m); cout << endl;
-	//cout << "Looking for: " << node.data[0] << endl;
-
 	if( list.size() > 50 ) {
 
 		int min = 0;
@@ -386,30 +376,12 @@ bool IsMapIndexInList
 	}
 
 	for(unsigned int i = 0; i < list.size(); i++ ) {
-		//if( fabs(node.phi-list[i].phi) < 0.0001 && 
-		//	fabs(node.theta-list[i].theta) < 0.0001 ) {
-		//	return true;
-		//}
-		////if( Equals(list[i].m,node.m ) ) {
-		////	cout << "	FOUND! "; PrintMorton(list[i].m); cout << " "; PrintMorton(node.m); cout << endl;
-		////	cout << endl;
-		////	return true;
-		////}
 		// If duplicate data index node is already in the list
 		if( list[i].data[0] == node.data[0] )  {
 			//cout << "	FOUND! " << list[i].data[0] << " " << node.data[0] << endl;
 			return true;
 		}
-		//if( LessThan(list[i].m,node.m) ) {
-		//}
-		//else if ( GreaterThan(list[i].m,node.m) ) {
-		//} else {
-		//	return true;
-		//}
 	}
-	//cout << "	"; PrintMorton(node.m); cout << " NOT FOUND..."; cout << endl;
-	//cout << "	" << node.data[0] << " NOT FOUND... " << endl;
-	//cout << endl;
 	return false;
 }
 
@@ -529,14 +501,10 @@ std::vector<int> MultiResHpx::GetNodeSizeHistogram()
 			// Update the master node size histogram, expanding it if need be...
 			if( temp.size() >= node_size_histo.size() )
 			{
-				//DEBUG
-				cout << "Current MASTER histogram size = " << node_size_histo.size() << endl;
 				while( temp.size() >= node_size_histo.size() )
 				{
 					node_size_histo.push_back(0);
 				}
-				//DEBUG
-				cout << "\tNEW MASTER histogram size = " << node_size_histo.size() << endl;
 			}
 
 			for(  j = 0; j < temp.size(); j++)
@@ -685,10 +653,6 @@ void MultiResHpx::Insert2(pointing pt, int64 data_idx)
 	// Determine which face number (fn) HPX Longitude,Colatitude pair map to.
 	fn = hpxQ.FaceNum(pt);
 
-//#ifdef MRH_VERBOSE
-//		printf("Inserting: HPX %5.5f %5.5f %d into base node: %d\n",pt.phi,pt.theta,data_idx,fn);
-//#endif
-
 	// Create new Morton Node to be inserted based on its phi & theta
 	MortonNode new_node;
 	new_node.m = PhiThetaToMorton(pt.phi,pt.theta,max_tree_depth);
@@ -725,10 +689,6 @@ void MultiResHpx::Insert(pointing pt, int64 data_idx)
 	// Determine which face number (fn) HPX Longitude,Colatitude pair map to.
 	fn = hpxQ.FaceNum(pt);
 
-//#ifdef MRH_VERBOSE
-//		printf("Inserting: HPX %5.5f %5.5f %d into base node: %d\n",pt.phi,pt.theta,data_idx,fn);
-//#endif
-
 	// Insert data index into appropriate tree using normalized
 	// HEALPix indices
 	forest_[fn].InsertMortonNodeAtPhiTheta(pt,data_indices);
@@ -751,10 +711,6 @@ void MultiResHpx::Delete(pointing pt)
 	
 	// Determine which face number (fn) HPX Longitude,Colatitude pair map to.
 	fn = hpxQ.FaceNum(pt);
-
-#ifdef MRH_VERBOSE
-		printf("Deleting: HPX %5.5f %5.5f from base node: %d\n",pt.phi,pt.theta,fn);
-#endif
 
 	// Delete node from appropriate tree 
 	forest_[fn].DeleteMortonNodeAtPhiTheta(pt);
@@ -1122,10 +1078,6 @@ std::vector<MortonNode> MultiResHpx::Search(int64 hpxid, int order, bool upsearc
 	// which MortonLQT to search.
 	fn = hpxQ.FaceNum(hpxid,order);
 	
-#ifdef MRH_VERBOSE
-	   cout << "MultiResHpx::Search fn = " << fn << endl;
-#endif
-
 	// Next shift hpxid,order from base N to base 0 range.
 	hpxid = hpxid - fn*order_to_npface[order];
 
@@ -1139,17 +1091,6 @@ std::vector<MortonNode> MultiResHpx::Search(int64 hpxid, int order, bool upsearc
 	
 		while( Done == false ) {
 
-#ifdef UPSEARCHCOUNT
-           UPSEARCH_COUNT += 1;
-#endif
-
-#ifdef MRH_VERBOSE
-		   cout << "MultiResHpx::Search shifted hpxid = " << hpxid << " order = " << order << endl;
-#endif
-
-#ifdef MRH_VERBOSE
-		   cout << "MultiResHpx::Search found " << found.size() << " data nodes." << endl;
-#endif
 			// Compute parent of hpxid,order
 			hpxid = hpxid >> 2;
 			order -= 1;
@@ -1196,10 +1137,6 @@ std::vector<MortonNode> MultiResHpx::Search(int64 hpxid, int order, bool upsearc
 // http://geographiclib.sourceforge.net/html/index.html
 std::vector<MortonNode> MultiResHpx::QueryDisc(pointing center,double radius)
 {
-
-#ifdef CRITCOUNT
-    ResetCritCount();
-#endif
 	pointing pt;
 	rangeset<int64> covermapHPX;
 	std::vector<pair<int64,int>> covermapMRH;
@@ -1218,9 +1155,6 @@ std::vector<MortonNode> MultiResHpx::QueryDisc(pointing center,double radius)
 			order_set = true; i = 30;
 			break;
 		}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
     }
 	// Want to cap the maximum HPX disc query resolution to
 	// never be greater than maximum resolution of MRH.
@@ -1244,53 +1178,7 @@ std::vector<MortonNode> MultiResHpx::QueryDisc(pointing center,double radius)
 		nPair.first = covermapHPX2[i];
 		nPair.second = order;
 		covermapMRH.push_back(nPair);
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 	}
-
-#ifdef HPX_COVERAGE_MAP
-		int64 save_order;
-	    std::vector<pair<int64,int>> pixset3;
-		// Get Current Maximum QuadTree Depth
-		max_tree_depth = MaxDepth();
-
-		// Before query, set HPX Query order to 1/4 Maximum Tree Depth.
-		save_order = hpxQ.Order();
-		hpxQ.Set(max_tree_depth,hpx_scheme);
-	    hpxQ.query_disc_inclusive(center,radius,pixset3,1);
-
-
-		cout << pixset3.size() << " \nHPX cells map to query polygon." << endl;
-		cout << "\nHpx Polygon Query Results: " << endl;
-		std::vector<vec3> out;
-		pointing bnd;
-
- 	    for( i = 0; i < pixset3.size(); i++) {
-			//Output hpxid,order
- 		    cout << pixset3[i].first << "," << pixset3[i].second;
-
-			// Get pixel center
-			Pix2ang(pixset3[i].first,pixset3[i].second,pt);
-			// Output hpxid center in p,z
-			cout << "," << pt.phi/pi << "," << cos(pt.theta);
-
-			// Get pixel boundaries
-			Boundaries (pixset3[i].first,pixset3[i].second,1,out);
-			// Convert vec3 to phi/theta pairs and output
-			for(j = out.size()-1; j >= 0; j--) {
-				Vec2ang(out[j],bnd);
-				cout << "," << bnd.phi/pi << "," << cos(bnd.theta);
-			}
-			cout << "\n";
-		}
-		cout << "\n";
-		hpxQ.Set(save_order,hpx_scheme);
-#endif
-
-#ifdef HPX_COVERAGE_MAP_CELL_COUNT
-		cout << "MRH Query Disc HPX Coverage Map Cell Count:," << pixset.size() << endl;
-#endif
 
 	// Now search for hpxQ results in Morton LQT forest
 	found.clear();
@@ -1306,15 +1194,8 @@ std::vector<MortonNode> MultiResHpx::QueryDisc(pointing center,double radius)
 			if( IsPointInDisc(center,radius,pt) == true ) {
 				found.push_back(candidate[j]);
 			}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 	   }
 	}
-#ifdef CRITCOUNT
-    MRH_COVER_MAP_SIZE = covermapMRH.size();
-	MRH_COVER_MAP_CELL_RES = order;
-#endif
 	return found;
 }
 
@@ -1328,9 +1209,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
  std::vector<pointing> poly
 )  
 {
-#ifdef CRITCOUNT
-    ResetCritCount();
-#endif
 	pointing pt,pt0,p0proj;
 	std::vector<pointing> p;
 	std::vector<pair<int64,int>> covermapMRH;
@@ -1352,9 +1230,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 		if( poly[n].phi > max_phi ) { max_phi = poly[n].phi; }
 		if( poly[n].theta < min_theta ) { min_theta = poly[n].theta; }
 		if( poly[n].theta > max_theta ) { max_theta = poly[n].theta; }
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 	}
 	poly_area = RadialDist(pointing(min_theta,min_phi),pointing(max_theta,max_phi));
 	poly_area *= poly_area;
@@ -1367,9 +1242,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 			order_set = true; k = 30;
 			break;
 		}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
     }
 	// Want to cap the maximum HPX disc query resolution to
 	// never be greater than maximum resolution of MRH.
@@ -1396,54 +1268,7 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 		nPair.first = covermapHPX2[i];
 		nPair.second = order;
 		covermapMRH.push_back(nPair);
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 	}
-
-
-#ifdef HPX_COVERAGE_MAP
-		int64 save_order;
-	    std::vector<pair<int64,int>> pixset3;
-		// Get Current Maximum QuadTree Depth
-		max_tree_depth = MaxDepth();
-
-		// Before query, set HPX Query order to 1/4 Maximum Tree Depth.
-		save_order = hpxQ.Order();
-		hpxQ.Set(max_tree_depth,hpx_scheme);
-	    hpxQ.query_polygon_inclusive(poly,pixset3,1);
-
-
-		cout << pixset3.size() << " \nHPX cells map to query polygon." << endl;
-		cout << "\nHpx Polygon Query Results: " << endl;
-		std::vector<vec3> out;
-		pointing bnd;
-
- 	    for( i = 0; i < pixset3.size(); i++) {
-			//Output hpxid,order
- 		    cout << pixset3[i].first << "," << pixset3[i].second;
-
-			// Get pixel center
-			Pix2ang(pixset3[i].first,pixset3[i].second,pt);
-			// Output hpxid center in p,z
-			cout << "," << pt.phi/pi << "," << cos(pt.theta);
-
-			// Get pixel boundaries
-			Boundaries (pixset3[i].first,pixset3[i].second,1,out);
-			// Convert vec3 to phi/theta pairs and output
-			for(j = out.size()-1; j >= 0; j--) {
-				Vec2ang(out[j],bnd);
-				cout << "," << bnd.phi/pi << "," << cos(bnd.theta);
-			}
-			cout << "\n";
-		}
-		cout << "\n";
-		hpxQ.Set(save_order,hpx_scheme);
-#endif
-
-#ifdef HPX_COVERAGE_MAP_CELL_COUNT
-		cout << "MRH Query Poly HPX Coverage Map Cell Count:," << pixset2.size() << endl;
-#endif
 
 	// Now Search through blanket coverage to discover data points within
 	// query polygon.
@@ -1483,9 +1308,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 					over_horizon = true;
 					k = poly.size(); // exit the loop
 				}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 			}
 
 			// If found point is flagged as over the horizon then reject, else
@@ -1499,10 +1321,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 		}
 		candidate.clear();
 	}
-#ifdef CRITCOUNT
-    MRH_COVER_MAP_SIZE = covermapMRH.size();
-	MRH_COVER_MAP_CELL_RES = order;
-#endif
 	return found;
 }
 
@@ -1515,9 +1333,6 @@ std::vector<MortonNode> MultiResHpx::QueryStrip
  double theta2 
 )
 {
-#ifdef CRITCOUNT
-    ResetCritCount();
-#endif
 	pointing pt;
     std::vector<MortonNode> found;
 	MortonNode m;
@@ -1537,9 +1352,6 @@ std::vector<MortonNode> MultiResHpx::QueryStrip
 					found.push_back(m);
 				}				
 			}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 		}
 	}
 
@@ -1551,9 +1363,6 @@ std::vector<MortonNode> MultiResHpx::QueryStrip
 
 std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 {
-#ifdef CRITCOUNT
-    ResetCritCount();
-#endif
 	pointing pt0,p0proj;
 	std::vector<pointing> p;
 	bool over_horizon = false;
@@ -1595,9 +1404,6 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 		save_order = hpxQ.Order();
 		hpxQ.Set(order,NEST);
 	} else {
-#ifdef MRH_VERBOSE
-			cout << "\tNeighbor query point not found!" << endl;
-#endif
 			return found;
 	}
 
@@ -1605,34 +1411,8 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 	Qhpxid.first = hpxQ.ang2pix(pt);
     Qhpxid.second = order;
 
-#ifdef MRH_VERBOSE
-	cout << "Neighbor Query HPXID: " << Qhpxid.first << ", " << Qhpxid.second << endl;
-	cout << "Neighbor Query Loc: " << pt.phi << ", " << pt.theta << endl;
-#endif
-
-#ifdef HPX_COVERAGE_MAP
-		int fn = hpxQ.FaceNum(pt);
-		cout << "\tHPX Phi: " << pt.phi << endl
-			 << "\tHPX Lat: " << pt.theta << endl
-			 << "\tP: " << pt.phi/pi << endl
-			 << "\tZ: " << cos(pt.theta) << endl
-			 << "\tFace Num: " << fn << endl
-			 << "\tHPXid: " << hpxid.first << endl
-			 << "\tOrder: " << hpxid.second << endl << endl;
-#endif
 	//Call healpix_custom's neighbors
     hpxQ.neighbors( Qhpxid, covermapHPX);
-
-#ifdef HPX_COVERAGE_MAP
-		cout << "\n\nMRH's internal Hpx Neighbor Query Results: " << endl;
-		for( i = 0; i < pixset.size(); i++) 
-		{
-		   cout << "   " << pixset[i].first << "," << pixset[i].second << endl;
-		   HpxPZCellBoundaries(pixset[i],1);
-		   cout << endl;
-		}
-		cout << "\n\n";
-#endif
 
 	// Compute the neighbor net using the boundaries of
     // neighboring cells of query cell
@@ -1663,20 +1443,8 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 			if( newpt.phi > max_phi.phi ) {
 				max_phi.theta = newpt.theta;  max_phi.phi = newpt.phi;
 			}
-#ifdef CRITCOUNT
-    MRH_CRIT_COUNT += 1;
-#endif
 		}
 	}
-
-#ifdef MRH_VERBOSE
-	cout << "\n\n#### NEIGHBOR NET POLYGON ####\n";
-	cout << min_theta.phi << "," << min_theta.theta << "," << min_theta.phi/pi << "," << cos(min_theta.theta) << endl;
-	cout << max_phi.phi << "," << max_phi.theta << "," << max_phi.phi/pi << "," << cos(max_phi.theta) << endl;
-	cout << max_theta.phi << "," << max_theta.theta << "," << max_theta.phi/pi << "," << cos(max_theta.theta) << endl;
-	cout << min_phi.phi << "," << min_phi.theta << "," << min_phi.phi/pi << "," << cos(min_phi.theta) << endl;
-	cout << min_theta.phi << "," << min_theta.theta << "," << min_theta.phi/pi << "," << cos(min_theta.theta) << endl << endl;
-#endif
 
 	// Will use neighbor net polygon definition to call 
 	// define point-in-polygon test to filtering out
@@ -1693,18 +1461,9 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 		// Search for each HPXid in MRH
 		candidate.clear();
 		hpxid = covermapHPX[i];
-#ifdef MRH_VERBOSE
-		cout << "\tNeighbors HPXID: " << hpxid.first << ", " << hpxid.second << endl;
-#endif
 		candidate = Search(hpxid.first,hpxid.second,true);
 
-#ifdef MRH_VERBOSE
-		cout << "\t\tNum Pts Found: " << candidate.size() << endl;
-#endif
 		for( j = 0; j < candidate.size(); j++) {
-#ifdef MRH_VERBOSE
-			cout << "\t\t\t" << candidate[j].phi << ", " << candidate[j].theta << ", " << candidate[j].data[0] << endl;
-#endif
 			SKIP = false;
 
 			// Skip if candidate is query point
@@ -1753,9 +1512,6 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 						over_horizon = true;
 						k = poly.size(); // exit the loop
 					}
-#ifdef CRITCOUNT
-					MRH_CRIT_COUNT += 1;
-#endif
 				}
 
 				// If found point is flagged as over the horizon then reject, else
@@ -1935,9 +1691,6 @@ int MultiResHpx::SaveToFile(std::string filename)
 
 	return true;
 }
-
-
-
 
 
 int MultiResHpx::LoadFromFile(std::string filename)

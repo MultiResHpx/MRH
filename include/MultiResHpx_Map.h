@@ -32,8 +32,6 @@ template<typename T> class MultiResHpx_Map: public MultiResHpx
 	    location which will produce unique HPX ID as key for record in map */
 	void AddRecord (T data, pointing pt);
 
-	void AddRecord2 (T data, pointing pt);
-
 	int SaveMapToArchive(std::string filename);
 
 	int LoadMapFromArchive(std::string filename);
@@ -71,80 +69,7 @@ template<typename T> class MultiResHpx_Map: public MultiResHpx
 
     std::vector<pair<T,T>> TwoPointCorrBin( double radius );
 
-	// Insertion operator
-	//friend std::ostream& operator<<(std::ostream& os, const MultiResHpx_Map& s)
-	//{
-	//	os << s.numrec << '\n';
-	//	for(int i = 0; i < s.numrec; i++) {
-	//		os << s.map[i];
-	//	}
-	//	return os;
-	//}
-	// Extraction operator
-	//friend std::istream& operator>>(std::istream& is, MultiResHpx_Map& s)
-	//{
-	//	// read in individual members of s
-	//	is >> s.numrec >> s.map;
-	//	return is;
-	//}
-
 };
-
-
-template<typename T> inline void MultiResHpx_Map<T>::AddRecord2 
-(
- T record, 
- pointing pt
-)
-{
-    // !!!!BENCHMARKING MODIFICATION!!! 
-	// Since HEALPix_Map allows for overwriting map records when multiple data points map to same 
-	// HEALPix index, we need to be able to mimic that behavior with MRH_Map. So BEFORE we add new
-	// map record we FIRST determine if the new map record's spatial coordinates are already found
-	// in a previously inserted map record. If so, we'll replace the previously inserted map record
-	// with this new one. Otherewise, just append the new map record as always.
-	bool overwrite = false;
-	std::vector<MortonNode> found = MultiResHpx::Search(pt);
-
-	// If found pt in MultiResHpx data structure:
-	// 1. Are spatial coordinates IDENTICAL to within machine epsilon? OR
-	// 2. Is Morton Code of "found" at maximum resolution? 
-	//
-	// If either #1 or #2 are true then new pt (and data) will overwrite existing map
-	// element and reference in MultiResHpx data structure.
-	//
-	// Otherwise, don't overwrite the map record and proceed as normal, append new map record
-	// and append spatial coordinate reference into MultiResHpx data structure
-	if(found.size() > 0 ) {
-
-		// Are spatial coordinates of "found" and "pt" IDENTICAL to within machine epsilon?
-		if( abs_approx(pt.phi,found[0].phi) && abs_approx(pt.theta,found[0].theta) ) {
-			overwrite = true;
-		}
-
-		// Is Morton Code of "found" at maximum resolution 
-		if( found[0].m.LEVEL == MultiResHpx::GetTreeDepthLimit() ) {
-			overwrite = true;
-		}
-	}
-
-	if( overwrite == false )
-	{
-		// Add element to map
-		map.push_back(record);
-
-		// Add map record index to MRH data structure as leaf node
-		MultiResHpx::Insert2( pt, numrec );
-
-		// Increment number of map records
-		numrec += 1;
-	} else {
-		// Overwrite existing record with new record
-		map[found[0].data[0]] = record;
-		MultiResHpx::Insert2( pt, found[0].data[0] );
-	}
-
-}
 
 
 /*! Adds \a T template type record to map and associates it with pointing vector
@@ -155,58 +80,6 @@ template<typename T> inline void MultiResHpx_Map<T>::AddRecord
  pointing pt
 )
 {
-
-    // !!!!BENCHMARKING MODIFICATION!!! 
-	// Since HEALPix_Map allows for overwriting map records when multiple data points map to same 
-	// HEALPix index, we need to be able to mimic that behavior with MRH_Map. So BEFORE we add new
-	// map record we FIRST determine if the new map record's spatial coordinates are already found
-	// in a previously inserted map record. If so, we'll replace the previously inserted map record
-	// with this new one. Otherewise, just append the new map record as always.
-#ifdef BENCHMARKING
-	bool overwrite = false;
-	std::vector<MortonNode> found = MultiResHpx::Search(pt);
-
-	// If found pt in MultiResHpx data structure:
-	// 1. Are spatial coordinates IDENTICAL to within machine epsilon? OR
-	// 2. Is Morton Code of "found" at maximum resolution? 
-	//
-	// If either #1 or #2 are true then new pt (and data) will overwrite existing map
-	// element and reference in MultiResHpx data structure.
-	//
-	// Otherwise, don't overwrite the map record and proceed as normal, append new map record
-	// and insert spatial coordinate reference into MultiResHpx data structure
-	if(found.size() > 0 ) {
-
-		// Are spatial coordinates of "found" and "pt" IDENTICAL to within machine epsilon?
-		if( abs_approx(pt.phi,found[0].phi) && abs_approx(pt.theta,found[0].theta) ) {
-			overwrite = true;
-		}
-
-		// Is Morton Code of "found" at maximum resolution 
-		if( found[0].m.LEVEL == MultiResHpx::GetTreeDepthLimit() ) {
-			overwrite = true;
-		}
-
-	} 
-	
-	if( overwrite == false )
-	{
-		// Add element to map
-		map.push_back(record);
-
-		// Add map record index to MRH data structure as leaf node
-		MultiResHpx::Insert( pt, numrec );
-
-		// Increment number of map records
-		numrec += 1;
-	} else {
-
-		// Overwrite existing record with new record
-		map[found[0].data[0]] = record;
-		MultiResHpx::Insert( pt, found[0].data[0] );
-
-	}
-#else
 	// Add data record to map
 	map.push_back(record);
 
@@ -215,7 +88,6 @@ template<typename T> inline void MultiResHpx_Map<T>::AddRecord
 
 	// Increment number of map records
 	numrec += 1;
-#endif
 }
 
 template<typename T> 
@@ -400,7 +272,6 @@ template<typename T> std::vector<pair<T,T>> MultiResHpx_Map<T>::TwoPointCorrBin(
 			nPair.first = map[ foundIDX[i].first.data[j] ];
 			nPair.second = map[ foundIDX[i].second.data[j] ];
 			foundTT.push_back(nPair);
-			//foundTT.push_back( map[ foundIDX[i].data[j] ] );
 		}
 	}
 	return foundTT;

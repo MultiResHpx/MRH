@@ -52,33 +52,6 @@ void Healpix_Custom::boundaries
   }
 }
 
-//void Healpix_Custom::poly_boundaries
-//(
-// const std::vector<pointing> &vertex, 
-// tsize step,
-// std::vector<pointing> &out
-//) const
-//{
-//  out.resize(4*step);
-//  int ix, iy, face;
-//  //pix2xyf(pix.first, ix, iy, face);
-//  //double dc = 0.5 / nside_;
-//  //double xc = (ix + 0.5)/nside_, yc = (iy + 0.5)/nside_;
-//  double d = 1.0/(step*nside_);
-//  for (tsize i=0; i<step; ++i){
-//    double z, phi, sth;
-//    bool have_sth;
-//    //xyf2loc(xc+dc-i*d, yc+dc, face, z, phi, sth, have_sth);
-//	out[i] = locToVec3(z, phi, sth, have_sth);
-//    //xyf2loc(xc-dc, yc+dc-i*d, face, z, phi, sth, have_sth);
-//    out[i+step] = locToVec3(z, phi, sth, have_sth);
-//    //xyf2loc(xc-dc+i*d, yc-dc, face, z, phi, sth, have_sth);
-//    out[i+2*step] = locToVec3(z, phi, sth, have_sth);
-//    //xyf2loc(xc+dc, yc-dc+i*d, face, z, phi, sth, have_sth);
-//    out[i+3*step] = locToVec3(z, phi, sth, have_sth);
-//  }
-//}
-
 
 const int Healpix_Custom::FaceNum
 ( 
@@ -180,12 +153,6 @@ template<typename int64> inline void check_pixel
     {
     if (zone>=3)//pixel lies completely inside the shape
       {
-    //  int sdist=2*(order_-o); // the "bit-shift distance" between map orders
-	   //int64 spix = pix<<sdist;
-	   //int64 epix = (pix+1)<<sdist;
-    //  for (int i=0; i<4; ++i)
-		  // pixset.push_back(make_pair(spix+i,o+1));
-	  //pixset.append(pix<<sdist,(pix+1)<<sdist); // output all subpixels <=== ORIGINAL
       pixset.push_back(make_pair(pix,o)); // output lowest level pixel
       }
     else // (zone>=1) pixel may overlap with the shape, pixel center is outside
@@ -196,8 +163,6 @@ template<typename int64> inline void check_pixel
     {
     if (zone>=2) // pixel center is inside the shape, but maybe not the complete pixel
       {
-      //pixset.append(pix>>(2*(o-order_))); // output the parent pixel at order_ <=== ORIGINAL
-      //pixset.push_back(make_pair(pix,o)); // output the parent pixel at order_
       pixset.push_back(make_pair(pix>>(2*(o-order_)),o)); // ROB output the parent pixel at order_
       stk.resize(stacktop); // unwind the stack
       }
@@ -208,8 +173,6 @@ template<typename int64> inline void check_pixel
           stk.push_back(make_pair(4*pix+3-i,o+1));
       else // at resolution limit
         {
-        //pixset.append(pix>>(2*(o-order_))); // output the parent pixel at order_ <=== ORIGINAL
-        //pixset.push_back(make_pair(pix,o)); // output the parent pixel at order_
         pixset.push_back(make_pair(pix>>(2*(o-order_)),o)); // output the parent pixel at order_
         stk.resize(stacktop); // unwind the stack
         }
@@ -218,9 +181,7 @@ template<typename int64> inline void check_pixel
   else // o==order_
     {
     if (zone>=2) // pixel center is inside the shape, but maybe not the complete pixel
-      //pixset.append(pix); <=== ORIGINAL
       pixset.push_back(make_pair(pix,o)); 
-	  //donothing=1;
     else if (inclusive) // and (zone>=1) pixel may overlap with the shape, pixel center is outside
       {
       if (order_<omax) // check sublevels
@@ -230,9 +191,7 @@ template<typename int64> inline void check_pixel
           stk.push_back(make_pair(4*pix+3-i,o+1));
         }
       else // at resolution limit
-        //pixset.append(pix); // output the pixel <=== ORIGINAL
         pixset.push_back(make_pair(pix,o)); // output the pixel
-		//donothing=1;
       }
     }
 }
@@ -313,7 +272,6 @@ void Healpix_Custom::query_disc_internal
       rsmall = rbig = inclusive ? radius+max_pixrad() : radius;
 
     if (rsmall>=pi)
-      //{ pixset.append(0,npix_); return; }
 	{ append_pixel_range(0,npix_,order_,pixset); return; }
 
     rbig = min(pi,rbig);
@@ -334,7 +292,6 @@ void Healpix_Custom::query_disc_internal
       {
       int64 sp,rp; bool dummy;
       get_ring_info_small(irmin-1,sp,rp,dummy);
-      //pixset.append(0,sp+rp);
 	  append_pixel_range(0,sp+rp,order_,pixset);
       }
 
@@ -378,13 +335,10 @@ void Healpix_Custom::query_disc_internal
           { ip_lo-=nr; ip_hi-=nr; }
         if (ip_lo<0)
           {
-          //pixset.append(ipix1,ipix1+ip_hi+1);
-          //pixset.append(ipix1+ip_lo+nr,ipix2+1);
           append_pixel_range(ipix1,ipix1+ip_hi+1,order_,pixset);
 		  append_pixel_range(ipix1+ip_lo+nr,ipix2+1,order_,pixset);
   		  }
         else
-          //pixset.append(ipix1+ip_lo,ipix1+ip_hi+1);
           append_pixel_range(ipix1+ip_lo,ipix1+ip_hi+1,order_,pixset);
         }
       }
@@ -392,14 +346,12 @@ void Healpix_Custom::query_disc_internal
       {
       int64 sp,rp; bool dummy;
       get_ring_info_small(irmax+1,sp,rp,dummy);
-      //pixset.append(sp,npix_);
       append_pixel_range(sp,npix_,order_,pixset);
       }
     }
   else // scheme_==NEST
     {
     if (radius>=pi) // disk covers the whole sphere
-      //{ pixset.append(0,npix_); return; }
       { append_pixel_range(0,npix_,order_,pixset); return; }
 
     int oplus = 0;
@@ -558,7 +510,6 @@ void Healpix_Custom::query_multidisc
         else
           tr.intersect(ipix1+ip_lo,ipix1+ip_hi+1);
         }
-      //pixset.append(tr);
 	  append_pixel_range(tr.ivbegin(0),tr.ivend(0),order_,pixset);
       }
     }
@@ -818,7 +769,6 @@ void Healpix_Custom::query_strip_internal
     int64 pix1 = sp1,
       pix2 = sp2+rp2;
 
-    //if (pix1<=pix2) pixset.append(pix1,pix2);
     if (pix1<=pix2) append_pixel_range(pix1,pix2,order_,pixset);
     }
   else
@@ -843,11 +793,8 @@ void Healpix_Custom::query_strip
   else
   {
     query_strip_internal(0.,theta2,inclusive,pixset);
-    //rangeset<int64> ps2;
     vector<pair<int64,int>> ps2;
     query_strip_internal(theta1,pi,inclusive,ps2);
-    //pixset.append(ps2);
-    //append_pixel_range(ps2.begin(),ps2.end(),order_,pixset);
 	for(unsigned int i = 0; i < ps2.size(); i++) {
 		pixset.push_back(ps2[i]);
 	}

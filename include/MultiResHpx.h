@@ -278,15 +278,6 @@ private:
     int UPSEARCH_COUNT;
 };
 
-//inline int MultiResHpx::size() 
-//{
-//   int size = 0;
-//   for(int i = 0; i < 12; i++ ) {
-//     size += getBytesAtFace(i);
-//   }
-//	return size;
-//}
-
 
 inline void MultiResHpx::PrintTreeAtIndex(int fn)
 {

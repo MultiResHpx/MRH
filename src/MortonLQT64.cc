@@ -2,8 +2,6 @@
 #include "MortonLQT64.h"
 
 
-//int MortonLQT::CRIT_COUNT = 0;
-
 //#######
 //####### MORTON DATA TYPE UTILITY FUNCTIONS 
 //#######
@@ -233,9 +231,6 @@ void SetMortonBit(Morton& m,int64 mBit,int bitLevel)
 	if( bitLevel > m.LEVEL ) {
 		m.LEVEL = bitLevel;
 	}
-#ifdef MLQT_VERBOSE
-	   cout << "SetMortonBit Level: " << m.LEVEL << " Bit: " << mBit << " BitLevel: " << bitLevel << endl;
-#endif
    switch( bitLevel ) {
 		case 1:
 		   m.L1 = mBit; return;
@@ -370,9 +365,6 @@ Morton StringToMorton(std::string mStr)
 	ss.clear();
 	for(unsigned int i = 0; i < mStr.length(); i++ )
 	{
-		//bit = std::stoi(mStr[i],sizeof(int));
-		//bit = mStr[i];
-		//bitInt = atoi(mStr[i].c_str());
 		ss << mStr[i];
 		ss >> bit;
 		SetMortonBit(m,bit-1,i+1);
@@ -392,7 +384,6 @@ int64 StringToHpx(std::string mStr)
 		ss << mStr[i];
 		ss >> bit;
 		hpx = (hpx*10)+bit;
-		cout << "bit: " << bit << " hpx: " << hpx << endl;
     	ss.clear();
 	}
 	return hpx;
@@ -572,9 +563,6 @@ int64 GetBitMask(int order)
 
 Morton HpxToMorton(int64 hpxid,int order)
 {
-#ifdef MLQT_VERBOSE
-	  cout << "Input: hpxid = " << hpxid << " of order " << order << endl;
-#endif
 	Morton m;
 	int64 mask = 0;
 	int64 nextBit = 0;
@@ -582,13 +570,7 @@ Morton HpxToMorton(int64 hpxid,int order)
 	mask = GetBitMask(order);
 	for(int i = order; i > 0; i--)  
 	{
-#ifdef MLQT_VERBOSE
-	  cout << "  mask #" << i <<": " << mask << endl;
-#endif
 	  nextBit = ((hpxid & mask) >> ((2*i)-2) ); //Morton bits still in range 0,1,2,3 
-#ifdef MLQT_VERBOSE
-	  cout << "     value: " << nextBit << endl;
-#endif
 	  SetMortonBit(m,nextBit,(order-i)+1);
 	  mask = mask >> 2; //operator.rshift(mask,2) 
 	}
@@ -598,30 +580,15 @@ Morton HpxToMorton(int64 hpxid,int order)
 void MortonToHpx(Morton m,int64& hpxid, int& order)
 {
 	int64 nextBit = 0;
-#ifdef MLQT_VERBOSE 
-	cout << "Input: Morton = "; PrintMorton(m); cout << endl;
-#endif
 	order = GetMortonLevel(m);
-#ifdef MLQT_VERBOSE
-	printf("  Order: %d\n",order);
-#endif
 	hpxid = 0;
 	int temp = 0;
 	int64 shift = 0;
 	for(int i = order; i >= 1; i--)
 	{
 	  nextBit = GetMortonBit(m,i);
-#ifdef MLQT_VERBOSE
-	  cout << "  Morton digit #" << i << ": " << nextBit << endl;
-#endif
 	  nextBit = nextBit << shift; //operator.lshift(nextBit,shift)
-#ifdef MLQT_VERBOSE
-	  cout << "  after shift: " << nextBit << endl;
-#endif
 	  hpxid += nextBit;  
-#ifdef MLQT_VERBOSE
-	  cout << "hpxid " << hpxid << endl;
-#endif
 	  shift += 2;
 	}
 }
@@ -640,11 +607,6 @@ Morton PhiThetaToMorton(double longHpx,double coLatHpx,int order)
    hpxId.first = hpxId.first - hpxQ.FaceNum(hpxId.first,hpxId.second)*order_to_npface[order];
 
    Morton m = HpxToMorton(hpxId.first,hpxId.second);
-#ifdef MLQT_VERBOSE
-	cout << "Normalized HpxId: " << hpxId.first << " Order: " << hpxId.second << " Morton: ";
-	 	PrintMorton(m); 
-		cout << endl;
-#endif
    return m;
 }
 
@@ -661,9 +623,6 @@ pointing MortonToPhiTheta(Morton m)
 
    pt = hpxQ.pix2ang(hpxId);
 
-#ifdef MLQT_VERBOSE
-   cout << "Phi Hpx: " << pt.phi << " Theta Hpx: " << pt.theta << endl;
-#endif
    return pt;
 }
 
@@ -795,14 +754,10 @@ std::vector<int> MortonLQT::GetMortonNodeSizeHistogram()
 				// Now update histogram, expanding it if need be...
 				if( proximate_count >= node_size_histo.size() )
 				{
-					//DEBUG
-					cout << "Current histogram size = " << node_size_histo.size() << endl;
 					while( proximate_count >= node_size_histo.size() )
 					{
 						node_size_histo.push_back(0);
 					}
-					//DEBUG
-					cout << "\tNEW histogram size = " << node_size_histo.size() << endl;
 				}
 				node_size_histo[proximate_count]++;
 				proximate_count = 1;
@@ -972,9 +927,6 @@ std::vector<MortonNode> MortonLQT::SearchMortonNodeHpx(int64 hpxid,int order,int
 
 std::vector<MortonNode> MortonLQT::SearchMortonNode(Morton m,int sub,int sentinel)
 {
-#ifdef CRITCOUNT
-  CRIT_COUNT = 0;
-#endif
 	std::vector<MortonNode> found_nodes;
 	// If specified root node then search entire tree
 	if( m.LEVEL == 0 )
@@ -1083,25 +1035,6 @@ Morton MortonLQT::FindMortonAtPhiTheta(pointing pt)
 	return( m );
 }
 
-
-//std::vector<MortonNode> MortonLQT::GetClosestMortonNodeAtPhiTheta(pointing pt)
-//{
-//   double deltaNet;
-//   double minDist = 99999999.0;
-//   Morton m;
-//   int sub = -1;
-//   for( unsigned int i = 0; i < mTree.size(); i++ )
-//   {
-//  	  deltaNet = acos(fabs(cosdist_zphi(cos(pt.theta),pt.phi,cos(mTree[i].theta),mTree[i].phi)));
-//      if( deltaNet < minDist )
-//	  {
-//         minDist = deltaNet;
-//         m = mTree[i].m;
-//   	  }
-//   }
-//
-//   return SearchMortonNode(m,sub);
-//}
 
 MortonNode MortonLQT::GetNodeAtIndex(unsigned int index)
 {
@@ -1223,9 +1156,6 @@ void MortonLQT::UpdateMortonNode(MortonNode node)
     // Find index of list MortonNode object that contains 
 	// Morton code = m
 	int index = FindIndexAtMorton(node.m);
-#ifdef MLQT_VERBOSE
-		cout << "Index of "; PrintMorton(node.m); cout << " is " << index << endl;
-#endif
 	if( index != -1 )
 	{
 		mTree[index].m = node.m;
@@ -1235,19 +1165,6 @@ void MortonLQT::UpdateMortonNode(MortonNode node)
 		mTree[index].theta = node.theta;
 		mTree[index].data = node.data;
 		mTree[index].sentinel = node.sentinel;
-
-#ifdef MLQT_VERBOSE
-			cout << "Updated node: ";
-			PrintMorton(mTree[index].m);
-			cout << " " << mTree[index].sub << " "
-				 << mTree[index].childrenYN << " "
-				 << mTree[index].phi << " "
-				 << mTree[index].theta << " ";
-			for(unsigned int i = 0; i < mTree[index].data.size(); i++) {
-				cout << mTree[index].data[i] << " ";
-			}
- 			cout << endl;
-#endif
 	}
 }
 
@@ -1273,21 +1190,8 @@ void MortonLQT::AppendMortonNode(MortonNode node)
 	new_node.data = node.data;
 	new_node.sentinel = node.sentinel;
 	mTree.push_back(new_node);
-#ifdef MLQT_VERBOSE
-		cout << "Append duplicate new node: ";
-		PrintMorton(new_node.m);
-		cout << " " << new_node.sub << " "
-			 << new_node.childrenYN << " "
-			 << new_node.phi << " "
-		     << new_node.theta << " ";
-			for(unsigned int i = 0; i < new_node.data.size(); i++) {
-				cout << new_node.data[i] << " ";
-			}
- 			cout << endl;  
-#endif
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton2);
-	//qsort(&mTree,mTree.size(),sizeof(MortonNode),QSortFunctionMorton);
 }
 
 void MortonLQT::AddMortonNode2(MortonNode node)
@@ -1317,82 +1221,13 @@ void MortonLQT::AddMortonNode(MortonNode node)
 	new_node.data = node.data;
 	new_node.sentinel = node.sentinel;
 	mTree.push_back(new_node);
-#ifdef MLQT_VERBOSE
-		cout << "Added new node: ";
-		PrintMorton(new_node.m);
-		cout << " " << new_node.sub << " "
-			<<	new_node.childrenYN << " "
-			<< new_node.phi << " "
-			<< new_node.theta << " ";
-			for(unsigned int i = 0; i < new_node.data.size(); i++) {
-				cout << new_node.data[i] << " ";
-			}
- 			cout << endl;  
-#endif
 	// Now must add the other sibling nodes at same level of quad tree
-#ifdef SIBLINGNODES
-		std::vector<Morton> siblings = SiblingsOfMorton(node.m);     
-		if(MLQT_VERBOSE)
-		{
-			cout << "Create siblings of "; PrintMorton(node.m); cout << endl;
-			cout << " "; PrintMorton(siblings[0]); cout << endl;
-			cout << " "; PrintMorton(siblings[1]); cout << endl;
-			cout << " "; PrintMorton(siblings[2]); cout << endl;
-		}
-		MortonNode empty_node;
-		empty_node.m = siblings[0];
-		mTree.push_back(empty_node);
-		if(MLQT_VERBOSE)
-		{
-			cout << "Added sibling node: "; PrintMorton(empty_node.m); cout << " "
-													 << empty_node.sub << " "
-													 << empty_node.childrenYN << " "
-													 << empty_node.phi << " "
-													 << empty_node.theta << " ";
-													for(unsigned int i = 0; i < empty_node.data.size(); i++) {
-														cout << empty_node.data[i] << " ";
-													}
-													cout << endl;  
-		}
-		empty_node.m = siblings[1];
-		mTree.push_back(empty_node);
-		if(MLQT_VERBOSE)
-		{
-			cout << "Added sibling node: "; PrintMorton(empty_node.m); cout << " "
-													 << empty_node.sub << " "
-													 << empty_node.childrenYN << " "
-													 << empty_node.phi << " "
-													 << empty_node.theta << " ";
-													for(unsigned int i = 0; i < empty_node.data.size(); i++) {
-														cout << empty_node.data[i] << " ";
-													}
-													cout << endl;  
-		}
-		empty_node.m = siblings[2];
-		mTree.push_back(empty_node);
-		if(MLQT_VERBOSE)
-		{
-			cout << "Added sibling node: "; PrintMorton(empty_node.m); cout << " "
-													 << empty_node.sub << " "
-													 << empty_node.childrenYN << " "
-													 << empty_node.phi << " "
-													 << empty_node.theta << " ";
-													for(unsigned int i = 0; i < empty_node.data.size(); i++) {
-														cout << empty_node.data[i] << " ";
-													}
-													cout << endl;  
-		}
-#endif
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton2);
 
 	// Lastly, make sure parent (if exists) of new nodes is marked as having children
 	if( ParentOfMorton(node.m).LEVEL != 0 )
 	{
-#ifdef MLQT_VERBOSE
-			cout << "Update parent of "; PrintMorton(node.m); cout << " "; PrintMorton(ParentOfMorton(node.m));
-			cout << " as having children!" << endl; 
-#endif
 		MortonNode update_node;
 		update_node.m = ParentOfMorton(node.m);
 		update_node.phi = 0.0;
@@ -1461,16 +1296,10 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
        // Morton node with data
        if( node.size() > 0 ) {
          
-#ifdef MLQT_VERBOSE
-           cout << "Morton Node "; PrintMorton(node[0].m); cout << " found!" << endl;
-#endif
          // If Morton node has children then need to re-calculate Morton
          // code of node to be inserted to next level deeper.
          if( node[0].childrenYN == 1 ){
             
-#ifdef MLQT_VERBOSE
-				cout << "Found Morton Node "; PrintMorton(node[0].m); cout << " has children." << endl;
-#endif
             treeDepth += 1;
             new_m = PhiThetaToMorton(pt.phi,pt.theta,treeDepth);
             insert_node.m = new_m;  
@@ -1482,12 +1311,6 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
             // we have a node insertion collision!
             if( node[0].data.size() > 0 ){
               
-#ifdef MLQT_VERBOSE
-					cout << "Collision! Morton Node "; PrintMorton(node[0].m); cout << " already has data indices: ";
-					for(unsigned int i = 0; i < node[0].data.size(); i++)cout << node[0].data[i] << " ";
- 					cout << endl; 
-#endif
-
               // Store collided Morton Node's information for re-insertion
               pt_save.phi = node[0].phi;
               pt_save.theta = node[0].theta;
@@ -1505,14 +1328,7 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
 			  //    of resolution we'll simply overwrite the current node with new node.
 
 			  if( abs_approx(node[0].phi,insert_node.phi) && abs_approx(node[0].theta,insert_node.theta) ) {
-#ifdef MLQT_VERBOSE
-						cout << "New Morton Node and collided Morton Node have matching phi,theta values! Overwrite data index!\n";
-#endif
-#ifdef BENCHMARKING
-					node[0].data[0] = insert_node.data[0];
-#else
 					node[0].data.push_back(insert_node.data[0]);
-#endif
 					UpdateMortonNode(node[0]);
 					done = true;
 			  } else {
@@ -1520,19 +1336,7 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
 				  // If so will overwrite the OLD Node with NEW Node's phi,theta and data index.
 				  if( treeDepth > userMaxDepth ){
 	                 
-#ifdef MLQT_VERBOSE
-						cout << "Reached Max Tree Depth: Overwrite Collided Node with New Node "; PrintMorton(insert_node.m); cout << endl;
-						cout << "Specify deeper Max Tree Depth!" << endl;
-#endif
-
-#ifdef BENCHMARKING
-  	                 node[0].phi = insert_node.phi;
-					 node[0].theta = insert_node.theta;
-					 node[0].data[0] = insert_node.data[0];
-					 UpdateMortonNode(node[0]);
-#else
 					 AppendMortonNode(insert_node);
-#endif
 					 done = true;
 				  }
 				  // Re-insert the new MortonNode and collided MortonNode at next level in Morton Tree (higher resolution)
@@ -1553,27 +1357,12 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
 					   insert_node.theta = pt_save.theta;
 					   insert_node.childrenYN = childrenYN_save;
 					   insert_node.data = data_save;
-#ifdef MLQT_VERBOSE
-							cout << "Now re-insert the collided node with data ";
-							for(unsigned int i = 0; i < data_save.size(); i++) {
-								cout << data_save[i] << " ";
-							}
- 							cout << " to "; PrintMorton(new_m); cout << endl;
-#endif
 				  }
 			  }
 			}
             // Otherwise no insertion collision so update the data,phi,theta,etc
             // attributes of MortonNode.
             else{
-#ifdef MLQT_VERBOSE
-                cout << "No insertion collision found, updating Morton Node: "; 
-				PrintMorton(node[0].m); cout << " with ";
-				for(unsigned int i = 0; i < insert_node.data.size(); i++) {
-					cout << insert_node.data[i] << " ";
-				}
-				cout << endl;
-#endif
               UpdateMortonNode(insert_node);
               if( treeDepth > curTreeDepth ){
                 curTreeDepth = treeDepth;
@@ -1583,9 +1372,6 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
 		 }
 	   }            
        else{
-#ifdef MLQT_VERBOSE
-           cout << "Morton Node "; PrintMorton(insert_node.m); cout << " not found, Adding new Morton Node!" << endl;
-#endif
          // If Morton code not found in list then append it to the end
          // of the Morton list then sort the list ascending by Morton code
          AddMortonNode(insert_node);
@@ -1621,11 +1407,6 @@ void MortonLQT::DeleteMortonNodeAtMorton(Morton m,int sub)
 	{
 		return;
 	}
-#ifdef MLQT_VERBOSE
-	   cout << "DeleteMortonNodeAtMorton: "; PrintMorton(m); cout << " "
-			                            << sub << " "
-												 << index << endl;
-#endif
 	// Remove the node from the tree
 	mTree.erase(mTree.begin()+index);
 

@@ -324,13 +324,9 @@ template<typename I> template<typename I2>
 template<typename I> void T_Healpix_Base<I>::query_disc
   (pointing ptg, double radius, rangeset<I> &pixset) const
   {
-#ifdef CRITCOUNT
-  printf("Begin Disc Query:\n");
-#endif
+
   query_disc_internal (ptg, radius, 0, pixset);
-#ifdef CRITCOUNT
-  printf("End Disc Query:\n\n");
-#endif
+
   }
 
 template<typename I> void T_Healpix_Base<I>::query_disc_inclusive
@@ -505,9 +501,7 @@ template<typename I> template<typename I2>
 
       check_pixel (o, order_, omax, zone, pixset, pix, stk, inclusive,
         stacktop);
-#ifdef CRITCOUNT
-        CRITICAL_COUNT_ += 1;
-#endif
+
       bailout:;
       }
     }
@@ -597,9 +591,7 @@ template<typename I> void T_Healpix_Base<I>::query_multidisc_general
 
       check_pixel (o, order_, omax, zn, pixset, pix, stk, inclusive,
         stacktop);
-#ifdef CRITCOUNT
-        CRITICAL_COUNT_ += 1;
-#endif
+
       }
     }
   }
