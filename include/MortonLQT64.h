@@ -26,7 +26,7 @@ using namespace::std;
 
 //GLOBALS
 //#define MAXDEPTH 13 //32BIT machines
-#define MAXDEPTH 29 //64BIT machines
+//#define MAXDEPTH 29 //64BIT machines
 //#define SIBLINGNODES 
 //#define MLQT_VERBOSE 
 #define R2D 57.29577951308
