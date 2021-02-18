@@ -104,6 +104,9 @@ public:
 	void BuildForestFromArchive(ifstream& fp);
 
 	//// Getters
+	MortonNode GetMortonNodeAtDataIndex(int64 idx);
+	MortonNode GetMortonNodeAtMorton(Morton m);
+
 	vector< MortonLQT > GetForest();
 
 	//int getBytesAtFace(int fn) { return forest_[fn].bytes(); }
@@ -224,6 +227,8 @@ public:
     std::vector<MortonNode> QueryStrip ( double theta1, double theta2);
 
 	std::vector<MortonNode> Neighbors( pointing pt, int64 order );
+
+	std::vector<MortonNode> Neighbors(MortonNode m);
 
 	std::vector<std::pair<MortonNode,MortonNode>> TwoPointCorrBin( double radius );
 

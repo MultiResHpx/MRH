@@ -33,6 +33,11 @@ using namespace::std;
 /* Remove if already defined */
 typedef long long int64; typedef unsigned long long uint64;
 
+//#define DO_DISC_QUERYS
+//#define DO_POLY_QUERYS
+//#define DO_STRIP_QUERYS
+#define DO_NEIGHBOR_QUERYS
+
 
 class DiscType
 {
@@ -330,21 +335,24 @@ int main(int64 argc, char* argv[])
 	MultiResHpx_Map<Measurement> mMRH(MAXDEPTH, NEST);
 
 
-	// Step 1: Create some random "Measurement" data with random Lat. Long. point positions for MRH data structure
-	std::cout << "\nStep 1: Create some random ""Measurement"" data with random Lat. Long. point positions for MRH data structure.\n";
+	//Create some random "Measurement" data with random Lat. Long. point positions for MRH data structure
+	std::cout << "\nCreate some random ""Measurement"" data with random Lat. Long. point positions for MRH data structure.\n";
 	GenRandomData(NUMPOINTS, myMeasurements,MIN_PHI,MAX_PHI,MIN_THETA,MAX_THETA);
 
-	// Step 2: Insert the Measurements into MRH data structure.
-	std::cout << "\nStep 2: Insert the Measurements into MRH data structure.\n";
+	//Insert the Measurements into MRH data structure.
+	std::cout << "\nInsert the Measurements into MRH data structure.\n";
 	for (i = 0; i < NUMPOINTS; i++)
 	{
 		// Insert next GIS longitude,latitude, data index tuple into MRH
 		mMRH.AddRecord(myMeasurements[i], myMeasurements[i].pt);
-		cout << "Inserting Point " << i + 1 << " of " << NUMPOINTS << endl;
+		if (i % 100 == 0)
+		{
+			cout << "Inserting Point " << i + 1 << " of " << NUMPOINTS << endl;
+		}
 	}
 
-	// Step 3: Print out the MRH data structure's quad trees
-	std::cout << "\nStep 3: Print out the MRH data structure's quad trees.\n";
+	//Print out the MRH data structure's quad trees
+	std::cout << "\nPrint out the MRH data structure's quad trees.\n";
 	for (i = 0; i < 12; i++)
 	{
 		cout << "\n\n######################\n";
@@ -353,15 +361,16 @@ int main(int64 argc, char* argv[])
 		mMRH.PrintTreeAtIndex(i);
 	}
 
-	// Step 4: Create list of random Disc, Convex Polygon, Strip and Neighbor queries
-	std::cout << "\nStep 4: Create list of random Disc and Polygon queries\n";
+	//Create list of random Disc, Convex Polygon, Strip and Neighbor queries
+	std::cout << "\nCreate list of random Disc and Polygon queries\n";
 	Discs = CreateRandomDiscQueries(NUMQUERIES);
 	Polys = CreateRandomConvexPolyQueries(NUMQUERIES);
 	Strips = CreateRandomStripQueries(NUMQUERIES);
 	Neighbors = CreateRandomNeighborQueries(NUMQUERIES, myMeasurements);
 	
-	// Step 5: Run the Disc Queries the MRH data structure
-	std::cout << "\nStep 5: Run the Disc Queries the MRH data structure.\n";
+#ifdef DO_DISC_QUERYS
+	//Run the Disc Queries the MRH data structure
+	std::cout << "\nRun the Disc Queries the MRH data structure.\n";
 	for (i = 0; i < NUMQUERIES; i++)
 	{
 		// Report Disc Query Results
@@ -377,9 +386,11 @@ int main(int64 argc, char* argv[])
 				<< foundMeasurements[j].rec << "\n";
 		}
 	}
+#endif
 
-	// Step 6: Run the Polygon Queries the MRH data structure
-	std::cout << "\nStep 6: Run the Polygon Queries on the MRH data structure.\n";
+#ifdef DO_POLY_QUERYS
+	//Run the Polygon Queries the MRH data structure
+	std::cout << "\nRun the Polygon Queries on the MRH data structure.\n";
 	for (i = 0; i < NUMQUERIES; i++)
 	{
 		// Report Polygon Query Results
@@ -400,9 +411,11 @@ int main(int64 argc, char* argv[])
 				<< foundMeasurements[j].rec << "\n";
 		}
 	}
+#endif
 
-	// Step 7: Run the Strip Queries on the MRH data structure
-	std::cout << "\nStep 7: Run the Strip Queries on the MRH data structure.\n";
+#ifdef DO_STRIP_QUERYS
+	//Run the Strip Queries on the MRH data structure
+	std::cout << "\nRun the Strip Queries on the MRH data structure.\n";
 	for (i = 0; i < NUMQUERIES; i++)
 	{
 		// Report Strip Query Results
@@ -419,9 +432,11 @@ int main(int64 argc, char* argv[])
 				<< foundMeasurements[j].rec << "\n";
 		}
 	}
+#endif
 
-	// Step 8: Run the Neighbor Queries on the MRH data structure
-	std::cout << "\nStep 8: Run the Neighbor Queries on the MRH data structure.\n";
+#ifdef DO_NEIGHBOR_QUERYS
+	//Run the Neighbor Queries on the MRH data structure
+	std::cout << "\nRun the Neighbor Queries on the MRH data structure.\n";
 	for (i = 0; i < NUMQUERIES; i++)
 	{
 		// Report Neighbor Query Results
@@ -438,84 +453,34 @@ int main(int64 argc, char* argv[])
 				<< foundMeasurements[j].rec << "\n";
 		}
 	}
+#endif
 
-	// Step 9: Archive the MRH data structure
-	std::cout << "\nStep 9: Archive the MRH data structure.\n";
+	// Archive the MRH data structure
+	std::cout << "\nArchive the MRH data structure.\n";
 	mMRH.SaveMapToArchive("testArchivedMRH");
 
-	// Step 10: Restore the archived MRH data structure
-	std::cout << "\nStep 10: Restore the archived MRH data structure.\n";
+	// Restore the archived MRH data structure
+	std::cout << "\nRestore the archived MRH data structure.\n";
 	MultiResHpx_Map<Measurement> new_mMRH(MAXDEPTH, NEST);
 	new_mMRH.LoadMapFromArchive("testArchiveMRH");
 
-	// Step 11: Re-run Disc queries on restored MRH data structure for V&V purposes
-	std::cout << "\nStep 11: Re-run Disc Queries on restored MRH data structure for V&V purposes.\n";
+#ifdef DO_NEIGHBOR_QUERYS
+	// Run the Nearest Neighbor Queries on the MRH data structure
+	std::cout << "\nRun the Nearest Neighbor Queries on the MRH data structure.\n";
+	int64 index;
 	for (i = 0; i < NUMQUERIES; i++)
 	{
-		foundMeasurements = mMRH.QueryDisc(Discs[i].pt, Discs[i].radius);
-		std::cout << "\n\nDisc Query #" << i + 1 << " definition:\n";
-		std::cout << "Phi,Theta,P,Z,Radius: " << Discs[i].pt.phi << "," << Discs[i].pt.theta << ","
-			<< Discs[i].pt.phi / pi << "," << cos(Discs[i].pt.theta) << "," << Discs[i].radius << "\n\n";
-		std::cout << "Found Measurements: \n";
-		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
-		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
-				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
-				<< foundMeasurements[j].rec << "\n";
-		}
-	}
+		// Random index draw
+		index = rand() % (NUMPOINTS + 1);
 
-	// Step 12: Re-run the Polygon Queries the MRH data structure
-	std::cout << "\nStep 12: Re-run Polygon Queries on restored MRH data structure for V&V purposes.\n";
-	for (i = 0; i < NUMQUERIES; i++)
-	{
-		foundMeasurements = mMRH.QueryPolygon(Polys[i].pts);
-		std::cout << "\n\nPoly Query #" << i + 1 << " definition:\n";
-		std::cout << "Phi,Theta,P,Z,...\n";
-		for (unsigned j = 0; j < Polys[i].pts.size(); j++) {
-			std::cout << Polys[i].pts[j].phi << "," << Polys[i].pts[j].theta << ","
-				<< Polys[i].pts[j].phi / pi << "," << cos(Polys[i].pts[j].theta) << "\n";
-		}
-		std::cout << Polys[i].pts[0].phi << "," << Polys[i].pts[0].theta << ","
-			<< Polys[i].pts[0].phi / pi << "," << cos(Polys[i].pts[0].theta) << "\n";
-		std::cout << "Found Measurements: \n";
-		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
-		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
-				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
-				<< foundMeasurements[j].rec << "\n";
-		}
-	}
+		std::cout << "\n\nNearest Neighbor Query #" << i + 1 << " definition:\n";
+		std::cout << "Map Index\n";
+		std::cout << index << "\n";
 
-	// Step 13: Re-run the Strip Queries on the MRH data structure
-	std::cout << "\nStep 13: Re-run the Strip Queries on the MRH data structure for V&V purposes.\n";
-	for (i = 0; i < NUMQUERIES; i++)
-	{
-		// Report Strip Query Results
-		foundMeasurements = mMRH.QueryStrip(Strips[i].theta1, Strips[i].theta2);
-		std::cout << "\n\nStrip Query #" << i + 1 << " definition:\n";
-		std::cout << "Theta1,Theta2,Z1,Z2,...\n";
-		std::cout << Strips[i].theta1 << "," << Strips[i].theta2 << ","
-			<< cos(Strips[i].theta1) << "," << cos(Strips[i].theta2) << "\n";
-		std::cout << "Found Measurements: \n";
-		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
-		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
-				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
-				<< foundMeasurements[j].rec << "\n";
-		}
-	}
-
-	// Step 14: Re-run the Neighbor Queries on the MRH data structure
-	std::cout << "\nStep 14: Re-run the Neighbor Queries on the MRH data structure.\n";
-	for (i = 0; i < NUMQUERIES; i++)
-	{
 		// Report Neighbor Query Results
-		foundMeasurements = mMRH.Neighbors(Neighbors[i].pt, 1);
-		std::cout << "\n\nNeighbor Query #" << i + 1 << " definition:\n";
-		std::cout << "Phi,Theta,Depth\n";
-		std::cout << Neighbors[i].pt.phi << "," << Neighbors[i].pt.theta << ","
-			<< NEIGHBOR_QUERY_RESOLUTION << "\n";
+		foundMeasurements = mMRH.Neighbors(index);
+
+
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
@@ -524,5 +489,7 @@ int main(int64 argc, char* argv[])
 				<< foundMeasurements[j].rec << "\n";
 		}
 	}
+#endif
+
 }
 

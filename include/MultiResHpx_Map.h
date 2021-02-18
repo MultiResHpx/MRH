@@ -67,6 +67,8 @@ template<typename T> class MultiResHpx_Map: public MultiResHpx
 
 	std::vector<T> Neighbors( pointing pt, int64 order );
 
+	std::vector<T> Neighbors(int data_idx);
+
     std::vector<pair<T,T>> TwoPointCorrBin( double radius );
 
 };
@@ -258,6 +260,36 @@ template<typename T> std::vector<T> MultiResHpx_Map<T>::Neighbors( pointing pt, 
 			foundT.push_back( map[ foundIDX[i].data[j] ] );
 		}
 	}
+	return foundT;
+}
+
+/*! Returns all T data found in spatially adjacent neighboring MortonNodes */
+template<typename T> std::vector<T> MultiResHpx_Map<T>::Neighbors(int data_idx)
+{
+	std::vector<MortonNode> foundIDX;
+	std::vector<T> foundT;
+
+	std::cout << "Here MultiResHpx_Map::Neighbors 1\n";
+
+	// First get the MortonNode that contains data_idx
+	MortonNode center = MultiResHpx::GetMortonNodeAtDataIndex(data_idx);
+
+	std::cout << "Here MultiResHpx_Map::Neighbors "; PrintMorton(center.m); std::cout << "2\n";
+
+	// Next do neighbor search based purely on neighboring MortonNodes of 
+	// MortonLQT forest
+	foundIDX = MultiResHpx::Neighbors(center);
+
+	std::cout << "Here MultiResHpx_Map::Neighbors 3\n";
+
+	for (unsigned int i = 0; i < foundIDX.size(); i++) {
+		for (unsigned int j = 0; j < foundIDX[i].data.size(); j++) {
+			foundT.push_back(map[foundIDX[i].data[j]]);
+		}
+	}
+
+	std::cout << "Here MultiResHpx_Map::Neighbors 4\n";
+
 	return foundT;
 }
 

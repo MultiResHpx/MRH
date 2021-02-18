@@ -1036,6 +1036,8 @@ Morton MortonLQT::FindMortonAtPhiTheta(pointing pt)
 }
 
 
+
+
 MortonNode MortonLQT::GetNodeAtIndex(unsigned int index)
 {
 	return mTree[index];

@@ -200,7 +200,7 @@ public:
 	int FindIndexAtMorton(Morton m);
 	
 	int FindIndexAtMortonSub(Morton m,int sub);
-	
+
 	std::vector<MortonNode> SearchMortonNodeAtPhiTheta(pointing pt,int sentinel);
 
 	std::vector<MortonNode> SearchMortonNodeHpx(int64 hpxid,int order,int sentinel);
@@ -212,6 +212,7 @@ public:
 	Morton ClosestMortonToPhiTheta(std::vector<MortonNode> NodeList,pointing pt);
 
 	//// GET, APPEND, ADD INSERT NODE 
+
 	MortonNode GetNodeAtIndex(unsigned int index);
 
 	//std::vector<MortonNode> GetClosestMortonNodeAtPhiTheta(pointing pt);

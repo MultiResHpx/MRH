@@ -1536,6 +1536,82 @@ std::vector<MortonNode> MultiResHpx::Neighbors( pointing pt, int64 order )
 }
 
 
+std::vector<MortonNode> MultiResHpx::Neighbors(MortonNode m)
+{
+	int i = 0;
+	pair<int64, int> hpxid, Qhpxid;
+	fix_arr<pair<int64, int>, 8> covermapHPX;
+	std::vector<pointing> poly;
+	std::vector<MortonNode> QNode, found;
+	int64 save_order;
+	MortonNode nextMN;
+	Morton nextM;
+
+	// Update search sentinel value. During search if sentinel value matches discovered
+	// the sentinel value in potential found Morton LQT node (data point) we won't return
+	// that data point as it's already in the list of found data points.
+	search_sentinel += 1;
+
+	// Check the hpxQ indexing scheme setting.
+	// If RING, change to NEST for purpose of query.
+	// Then reset hpxQ indexing schme back to RING.
+	if (hpx_scheme == RING) {
+		hpxQ.Set(hpxQ.Order(), NEST);
+	}
+
+	// First search MRH for query point. If exists continue
+	// neighbor query at user specified level of resolution (order).
+	// Otherwise return empty vector. Save original hpxQ order.
+	save_order = hpxQ.Order();
+	hpxQ.Set(m.m.LEVEL, NEST);
+
+	// Next compute query point's hpxid for neighbor query
+	MortonToHpx(m.m, Qhpxid.first, Qhpxid.second);
+
+	//Call healpix_custom's neighbors
+	hpxQ.neighbors(Qhpxid, covermapHPX);
+
+	// First verify the query MortonNode is valid. If so continue
+	// neighbor query at user specified level of resolution (order).
+	// Otherwise return empty vector. Save original hpxQ order.
+	if (m.sentinel == -1 && m.data[0] == -1)
+	{
+		return found;
+	}
+
+	// Next compute query point's hpxid and order for neighbor query
+	MortonToHpx(m.m,Qhpxid.first, Qhpxid.second);
+
+	//Call healpix_custom's neighbors
+	hpxQ.neighbors(Qhpxid, covermapHPX);
+
+	// Now process the HPX covermap to convert each hpx id/order to Morton
+	for (i = 0; i < covermapHPX.size(); i++) 
+	{
+		hpxid = covermapHPX[i];
+
+		// Convert HPXID/ORDER to equivalent Morton number
+		nextM = HpxToMorton(hpxid.first, hpxid.second);
+
+		// Next retrieve MortonNode (if it exists)
+		nextMN = GetMortonNodeAtMorton(nextM);
+
+		// Check if this is a valid MortonNode, if so add it
+		// to list of found MortonNodes to return
+		if (nextMN.sentinel != -1 || nextMN.data[0] != -1)
+		{
+			found.push_back(nextMN);
+		}
+	}
+
+	// Set hpxQ order and scheme back to whatever it was before.
+	hpxQ.Set(save_order, hpx_scheme);
+	if (hpx_scheme == RING) {
+		hpxQ.Set(hpxQ.Order(), RING);
+	}
+	return found;
+}
+
 bool MultiResHpx::IsPointInCoverageMap(pointing pt,std::vector<pair<int64,int>> pixset)
 {
 	int64 hpxid_pt;
@@ -1664,6 +1740,63 @@ void MultiResHpx::BuildForestFromArchive(ifstream& fp)
 	{
 		forest_[i].LoadTreeFromFile(fp);
 	}
+}
+
+// Given a data index from MultiResHpx_Map, find and return the stored MortonNode
+MortonNode MultiResHpx::GetMortonNodeAtDataIndex(int64 data_idx)
+{
+	// Do linear search through all Twelve MortonLQTs to find and return the 
+	// MortonNode that contains data_idx.
+	MortonNode m;
+
+	for (unsigned int i = 0; i < 12; i++) {
+		for (unsigned int j = 0; j < forest_[i].GetNumMortonNodes(); j++) {
+			m = forest_[i].GetNodeAtIndex(j);
+			for (unsigned int k = 0; k < m.data.size(); k++)
+			{
+				if (m.data[k] == data_idx)
+				{
+					return m;
+				}
+			}
+		}
+	}
+	// If made it here, then MortonNode with data_idx wasn't found (for some reason).
+	// Flag the MortonNode to indicate this is an invalid MortonNode. 
+	m.childrenYN = false;
+	m.phi = -1;
+	m.theta = -1;
+	m.sentinel = -1;
+	m.sub = -1;
+	m.data.push_back(-1);
+	return m;
+}
+
+// Given a Morton number, find the MortonNode (if it exists)
+MortonNode MultiResHpx::GetMortonNodeAtMorton(Morton m)
+{
+	// Do linear search through all Twelve MortonLQTs to find and return the 
+	// MortonNode who's address is the given Morton number
+	MortonNode _m;
+
+	for (unsigned int i = 0; i < 12; i++) {
+		for (unsigned int j = 0; j < forest_[i].GetNumMortonNodes(); j++) {
+			_m = forest_[i].GetNodeAtIndex(j);
+			if (Equals(m, _m.m))
+			{
+				return _m;
+			}
+		}
+	}
+	// If made it here, then MortonNode with data_idx wasn't found (for some reason).
+	// Flag the MortonNode to indicate this is an invalid MortonNode. 
+	_m.childrenYN = false;
+	_m.phi = -1;
+	_m.theta = -1;
+	_m.sentinel = -1;
+	_m.sub = -1;
+	_m.data.push_back(-1);
+	return _m;
 }
 
 vector< MortonLQT > MultiResHpx::GetForest()
