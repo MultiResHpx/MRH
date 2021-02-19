@@ -41,7 +41,7 @@ class MortonNode
 {
 public:
 	MortonNode();
-	MortonNode(int64 _morton, int _sub, int _childrenYN, float _longitude, float _latitude, int _data);
+	MortonNode(int64 _morton, int _sub, int _childrenYN, float _longitude, float _latitude, int _data, int _facenum);
 	~MortonNode(){};
 
 //private:
@@ -51,6 +51,7 @@ public:
 	float longitude;
 	float latitude;
 	int data;
+	int facenum;
 
 
 };

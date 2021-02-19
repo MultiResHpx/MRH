@@ -153,7 +153,7 @@ class MortonNode
 {
 public:
 	MortonNode();
-	MortonNode(Morton _m, int _sub, int _childrenYN, double _phi, double _theta, int _data);
+	MortonNode(Morton _m, int _sub, int _childrenYN, double _phi, double _theta, int _data, int _facenum);
 	~MortonNode(){};
 
 //private:
@@ -164,6 +164,7 @@ public:
 	double theta;
 	std::vector<int64> data;
 	int sentinel; 
+	int facenum;
 };
 
 class MortonLQT 

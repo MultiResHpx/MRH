@@ -33,9 +33,9 @@ using namespace::std;
 /* Remove if already defined */
 typedef long long int64; typedef unsigned long long uint64;
 
-//#define DO_DISC_QUERYS
-//#define DO_POLY_QUERYS
-//#define DO_STRIP_QUERYS
+#define DO_DISC_QUERYS
+#define DO_POLY_QUERYS
+#define DO_STRIP_QUERYS
 #define DO_NEIGHBOR_QUERYS
 
 
@@ -106,7 +106,7 @@ inline bool Measurement::equals(const Measurement &other){
 	return false;
 }
 
-void GenRandomData(int numPoints,std::vector<Measurement>& ms,double LO_THETA, double HI_THETA, double LO_PHI, double HI_PHI)
+void GenRandomData(int numPoints,std::vector<Measurement>& ms, double LO_PHI, double HI_PHI, double LO_THETA, double HI_THETA)
 {
 	// GIS Longitude (Phi) Range: [-180.0,+180.0] degrees, relative to Prime Meridian.
 	// GIS Latitude (Theta) Range: [-90.0,+90.0] degrees, relative to Equator.
@@ -297,8 +297,11 @@ int main(int64 argc, char* argv[])
 	std::vector< DiscType > Discs;
 	std::vector< StripType > Strips;
 	std::vector< NeighborType > Neighbors;
+	MortonNode m;
 	int NUMPOINTS, MAXDEPTH, NUMQUERIES, NEIGHBOR_QUERY_RESOLUTION;
 	double MIN_PHI, MAX_PHI, MIN_THETA, MAX_THETA;
+
+	srand(time(NULL));
 
 	// Parse command line arguments: num data points, max tree depth, num queries
 	if (argc != 8)
@@ -376,12 +379,14 @@ int main(int64 argc, char* argv[])
 		// Report Disc Query Results
 		foundMeasurements = mMRH.QueryDisc(Discs[i].pt, Discs[i].radius);
 		std::cout << "\n\nDisc Query #" << i + 1 << " definition:\n";
-		std::cout << "Phi,Theta,P,Z,Radius: " << Discs[i].pt.phi << "," << Discs[i].pt.theta << ","
+		std::cout << "Morton,Phi,Theta,P,Z,Radius: " << Discs[i].pt.phi << "," << Discs[i].pt.theta << ","
 			<< Discs[i].pt.phi / pi << "," << cos(Discs[i].pt.theta) << "," << Discs[i].radius << "\n\n";
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec, m);
+			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
 				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
 				<< foundMeasurements[j].rec << "\n";
 		}
@@ -406,7 +411,9 @@ int main(int64 argc, char* argv[])
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec, m);
+			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
 				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
 				<< foundMeasurements[j].rec << "\n";
 		}
@@ -427,7 +434,9 @@ int main(int64 argc, char* argv[])
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec, m);
+			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
 				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
 				<< foundMeasurements[j].rec << "\n";
 		}
@@ -448,7 +457,9 @@ int main(int64 argc, char* argv[])
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec, m);
+			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
 				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
 				<< foundMeasurements[j].rec << "\n";
 		}
@@ -473,18 +484,20 @@ int main(int64 argc, char* argv[])
 		// Random index draw
 		index = rand() % (NUMPOINTS + 1);
 
+		mMRH.GetMortonNodeAtDataIndex(index, m);
+
 		std::cout << "\n\nNearest Neighbor Query #" << i + 1 << " definition:\n";
-		std::cout << "Map Index\n";
-		std::cout << index << "\n";
+		std::cout << "Query Morton,Map Index: ";PrintMorton(m.m); std::cout << "," << index << "\n";
 
 		// Report Neighbor Query Results
-		foundMeasurements = mMRH.Neighbors(index);
-
+		foundMeasurements = mMRH.NearNeighbors(index);
 
 		std::cout << "Found Measurements: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			std::cout << "Phi,Theta,P,Z,Rec: " << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec,m);
+			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m); 
+			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
 				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
 				<< foundMeasurements[j].rec << "\n";
 		}

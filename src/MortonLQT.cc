@@ -11,17 +11,19 @@ MortonNode::MortonNode() :
 	childrenYN(0),
 	longitude(0.0),
 	latitude(0.0),
-	data(-1)
+	data(-1),
+	facenum(0)
 {
 }
 
-MortonNode::MortonNode( int64 _morton, int _sub, int _childrenYN, float _longitude, float _latitude, int _data) :
+MortonNode::MortonNode( int64 _morton, int _sub, int _childrenYN, float _longitude, float _latitude, int _data, int _facenum) :
 	morton(_morton),
 	sub(_sub),
 	childrenYN(_childrenYN),
 	longitude(_longitude),
 	latitude(_latitude),
-	data(_data)
+	data(_data),
+	facenum(_facenum)
 {
 }
 
@@ -376,6 +378,7 @@ void MortonLQT::PrintMortonTree()
      for(unsigned int i = 0; i < GetNumMortonNodes(); i++)
 	 {
 		   cout << i << " "
+			      << mTree[i].facenum << " "
 				  << mTree[i].morton << " "
 				  << mTree[i].sub << " "
 			     << mTree[i].childrenYN << " "
@@ -538,6 +541,7 @@ std::vector<MortonNode> MortonLQT::GetNodeAtMorton(int morton,int sub)
 	found_node.latitude = mTree[index].latitude;
 	found_node.childrenYN = mTree[index].childrenYN;
 	found_node.data = mTree[index].data;
+	found_node.facenum = mTree[index].facenum;
 	found_node_list.push_back(found_node);
 
     // Because of possibility of concatenated, duplicate Morton Nodes we must
@@ -559,6 +563,7 @@ std::vector<MortonNode> MortonLQT::GetNodeAtMorton(int morton,int sub)
 				 found_node.latitude = mTree[index].latitude;
 				 found_node.childrenYN = mTree[index].childrenYN;
 				 found_node.data = mTree[index].data;
+				 found_node.facenum = mTree[index].facenum;
 				 found_node_list.push_back(found_node);
 			  }
 			  else
@@ -589,9 +594,11 @@ void MortonLQT::UpdateNode(MortonNode node)
 		mTree[index].longitude = node.longitude;
 		mTree[index].latitude = node.latitude;
 		mTree[index].data = node.data;
+		mTree[index].facenum = node.facenum;
 		if(VERBOSE)
 		{
-			cout << "Updated node: " << mTree[index].morton << " "
+			cout << "Updated node: " << mTree[index].facenum << " "
+									  << mTree[index].morton << " "
 				                      << mTree[index].sub << " "
 											 << mTree[index].childrenYN << " "
 											 << mTree[index].longitude << " "
@@ -619,10 +626,12 @@ void MortonLQT::AppendNode(MortonNode node)
 	new_node.longitude = node.longitude;
 	new_node.latitude = node.latitude;
 	new_node.data = node.data;
+	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
 	if(VERBOSE)
 	{
-		cout << "Append duplicate new node: " << new_node.morton << " "
+		cout << "Append duplicate new node: " << new_node.facenum << " "
+														  << new_node.morton << " "
 														  << new_node.sub << " "
 														  << new_node.childrenYN << " "
 														  << new_node.longitude << " "
@@ -642,10 +651,12 @@ void MortonLQT::AddNode(MortonNode node)
 	new_node.longitude = node.longitude;
 	new_node.latitude = node.latitude;
 	new_node.data = node.data;
+	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
 	if(VERBOSE)
 	{
-		cout << "Added new node: " << new_node.morton << " "
+		cout << "Added new node: " << new_node.facenum << " "
+									<< new_node.morton << " "
 											<< new_node.sub << " "
 											<<	new_node.childrenYN << " "
 											<< new_node.longitude << " "
@@ -666,7 +677,8 @@ void MortonLQT::AddNode(MortonNode node)
 	mTree.push_back(empty_node);
 	if(VERBOSE)
 	{
-		cout << "Added sibling node: " << empty_node.morton << " "
+		cout << "Added sibling node: " << empty_node.facenum << " "
+										<< empty_node.morton << " "
 												 << empty_node.sub << " "
 												 << empty_node.childrenYN << " "
 												 << empty_node.longitude << " "
@@ -677,7 +689,8 @@ void MortonLQT::AddNode(MortonNode node)
 	mTree.push_back(empty_node);
 	if(VERBOSE)
 	{
-		cout << "Added sibling node: " << empty_node.morton << " "
+		cout << "Added sibling node: " << empty_node.facenum << " "
+												<< empty_node.morton << " "
 												 << empty_node.sub << " "
 												 << empty_node.childrenYN << " "
 												 << empty_node.longitude << " "
@@ -688,7 +701,8 @@ void MortonLQT::AddNode(MortonNode node)
 	mTree.push_back(empty_node);
 	if(VERBOSE)
 	{
-		cout << "Added sibling node: " << empty_node.morton << " "
+		cout << "Added sibling node: " << empty_node.facenum << " "
+												<< empty_node.morton << " "
 												 << empty_node.sub << " "
 												 << empty_node.childrenYN << " "
 												 << empty_node.longitude << " "
@@ -943,7 +957,7 @@ int MortonLQT::LoadTreeFromFile(std::string filename)
 {
 	  char buffer[1024],nextLine[1024];
 	  long int res;
-	  int numNodes,nodeNumber,morton,sub,data;
+	  int numNodes,nodeNumber,facenum, morton,sub,data;
 	  int childrenYN;
 	  float longitude,latitude;
 	  ifstream fp;
@@ -971,12 +985,13 @@ int MortonLQT::LoadTreeFromFile(std::string filename)
       // Next lines are data records (the nodes of the tree)
       for(int i = 0; i < numNodes; i++)
 	  {
-	     fp >> nodeNumber >> morton >> sub >> childrenYN >> longitude >> latitude >> data;
+	     fp >> nodeNumber >> facenum >> morton >> sub >> childrenYN >> longitude >> latitude >> data;
          
 		 // Skip the rest of the line
 		 skip_line(fp);
 
       	 MortonNode next_node;
+		 next_node.facenum = facenum;
          next_node.morton = morton;
          next_node.sub = sub;
 		 next_node.childrenYN = childrenYN;
@@ -1004,6 +1019,7 @@ void MortonLQT::WriteHeader(FILE* fp)
   
      // Write out data record tags
      fprintf(fp,"INDEX\t");
+	 fprintf(fp, "FACENUM\t");
      fprintf(fp,"MORTON\t");
      fprintf(fp,"SUB\t");
      fprintf(fp,"CHILDRENYN\t");
@@ -1018,6 +1034,7 @@ void MortonLQT::WriteData(FILE* fp)
       for(int i = 0; i < GetNumMortonNodes(); i++)
 	  {
       	 fprintf(fp,"%d\t",i); // Index
+		 fprintf(fp, "%d\t", mTree[i].facenum); // Facenum
       	 fprintf(fp,"%ld\t",mTree[i].morton); // Morton
       	 fprintf(fp,"%d\t",mTree[i].sub); // Sub Index
       	 fprintf(fp,"%d\t",mTree[i].childrenYN); // Children YN

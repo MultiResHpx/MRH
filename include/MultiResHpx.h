@@ -104,8 +104,8 @@ public:
 	void BuildForestFromArchive(ifstream& fp);
 
 	//// Getters
-	MortonNode GetMortonNodeAtDataIndex(int64 idx);
-	MortonNode GetMortonNodeAtMorton(Morton m);
+	bool GetMortonNodeAtDataIndex(int64 qidx, MortonNode& foundM);
+	bool GetMortonNodeAtMorton(Morton qm, MortonNode& foundM);
 
 	vector< MortonLQT > GetForest();
 
@@ -219,6 +219,7 @@ public:
 	//// Queries
 	std::vector<MortonNode> Search (pointing pt);
 	std::vector<MortonNode> Search (int64 hpxid, int order, bool upsearch);
+	std::vector<MortonNode> Search (MortonNode qm, bool upsearch);
 
     std::vector<MortonNode> QueryDisc (pointing pt, double radius);
 
@@ -228,7 +229,7 @@ public:
 
 	std::vector<MortonNode> Neighbors( pointing pt, int64 order );
 
-	std::vector<MortonNode> Neighbors(MortonNode m);
+	std::vector<MortonNode> NearNeighbors(MortonNode m);
 
 	std::vector<std::pair<MortonNode,MortonNode>> TwoPointCorrBin( double radius );
 

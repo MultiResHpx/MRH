@@ -657,12 +657,13 @@ MortonNode::MortonNode() :
 {
 }
 
-MortonNode::MortonNode( Morton _m, int _sub, int _childrenYN, double _phi, double _theta, int _data) :
+MortonNode::MortonNode( Morton _m, int _sub, int _childrenYN, double _phi, double _theta, int _data, int _facenum) :
 	m(_m),
     sub(_sub),
 	childrenYN(_childrenYN),
 	phi(_phi),
-	theta(_theta)
+	theta(_theta),
+	facenum(_facenum)
 {
 	data.push_back(_data);
 	sentinel = -1;
@@ -1077,6 +1078,7 @@ std::vector<MortonNode> MortonLQT::GetNodeAtMorton(Morton m,int sub)
 	found_node.childrenYN = mTree[index].childrenYN;
 	found_node.data = mTree[index].data;
 	found_node.sentinel = mTree[index].sentinel;
+	found_node.facenum = mTree[index].facenum;
 	found_node_list.push_back(found_node);
 
     // Because of possibility of concatenated, duplicate Morton Nodes we must
@@ -1099,6 +1101,7 @@ std::vector<MortonNode> MortonLQT::GetNodeAtMorton(Morton m,int sub)
 				 found_node.childrenYN = mTree[index].childrenYN;
 				 found_node.data = mTree[index].data;
 				 found_node.sentinel = mTree[index].sentinel;
+				 found_node.facenum = mTree[index].facenum;
 				 found_node_list.push_back(found_node);
 			  }
 			  else
@@ -1167,6 +1170,7 @@ void MortonLQT::UpdateMortonNode(MortonNode node)
 		mTree[index].theta = node.theta;
 		mTree[index].data = node.data;
 		mTree[index].sentinel = node.sentinel;
+		mTree[index].facenum = node.facenum;
 	}
 }
 
@@ -1191,6 +1195,7 @@ void MortonLQT::AppendMortonNode(MortonNode node)
 	new_node.theta = node.theta;
 	new_node.data = node.data;
 	new_node.sentinel = node.sentinel;
+	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton2);
@@ -1206,6 +1211,7 @@ void MortonLQT::AddMortonNode2(MortonNode node)
 	new_node.theta = node.theta;
 	new_node.data = node.data;
 	new_node.sentinel = node.sentinel;
+	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
 
 	// Sort the tree
@@ -1222,6 +1228,7 @@ void MortonLQT::AddMortonNode(MortonNode node)
 	new_node.theta = node.theta;
 	new_node.data = node.data;
 	new_node.sentinel = node.sentinel;
+	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
 	// Now must add the other sibling nodes at same level of quad tree
 	// Sort the tree
@@ -1236,6 +1243,7 @@ void MortonLQT::AddMortonNode(MortonNode node)
 		update_node.theta = 0.0;
 		update_node.childrenYN = 1;
 		update_node.data.clear();
+		update_node.facenum = faceNum;
 		UpdateMortonNode(update_node);
 	}
 }
@@ -1278,6 +1286,7 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
 	insert_node.theta = pt.theta;
 	insert_node.data = data;
 	insert_node.childrenYN = 0;
+	insert_node.facenum = faceNum;
 
 	// Insert the new Morton node checking for data collision (Morton
 	// node who's "data" element is NOT equal to -1). When collision
@@ -1440,7 +1449,7 @@ void MortonLQT::SaveTreeToFile(ofstream& fp)
 
 void MortonLQT::LoadTreeFromFile(ifstream& fp)
 {
-	  int numNodes,nodeNumber,sub,num_data_indices;
+	int numNodes, nodeNumber, sub, num_data_indices, facenum;
 	  int64 next_data;
 	  std::string m;
 	  int childrenYN;
@@ -1464,13 +1473,14 @@ void MortonLQT::LoadTreeFromFile(ifstream& fp)
 	  {
        	 MortonNode next_node;
 
-	     fp >> nodeNumber >> m >> sub >> childrenYN >> phi >> theta;
+	     fp >> nodeNumber >> facenum >> m >> sub >> childrenYN >> phi >> theta;
 		 
 		 next_node.m = StringToMorton(m);
          next_node.sub = sub;
 		 next_node.childrenYN = childrenYN;
          next_node.phi = phi;
          next_node.theta = theta;
+		 next_node.facenum = facenum;
 
 		 // Now read in count of data indices mapped to this record
 		 fp >> num_data_indices;
@@ -1531,7 +1541,7 @@ void MortonLQT::PrintMortonTree()
 	 cout << "#################################################################################" << endl;
      cout << "#######                MORTON    LINEAR    QUAD    TREE                   #######" << endl;
 	 cout << "#################################################################################" << endl;
-     cout << "Index, Morton, SubAddr, ChildrenYN, Phi, Theta, Data, HPXid, HPXorder, Sentinel" << endl;
+     cout << "Index, Facenum, Morton, SubAddr, ChildrenYN, Phi, Theta, Data, HPXid, HPXorder, Sentinel" << endl;
      cout << "=================================================================================" << endl;
      for( int i = 0; i < GetNumMortonNodes(); i++)
 	 {
@@ -1542,6 +1552,7 @@ void MortonLQT::PrintMortonTree()
         hpxId.first = hpxQ.ang2pix(p1);
         hpxId.second = GetMortonLevel(mTree[i].m);
 		   cout << i << ", ";
+		   cout << mTree[i].facenum << ", ";
 		   PrintMorton(mTree[i].m); cout << ", ";
 		   cout	<< mTree[i].sub << ", "
 			    << mTree[i].childrenYN << ", "
