@@ -1,0 +1,16 @@
+*** MultiResHpx DEPENDENCIES ***
+
+MultiResHpx is pretty much a standalone code that only depends on the user acquiring and
+building GeographicLib-1.51 available at (https://sourceforge.net/projects/geographiclib/files/distrib/)
+
+In particular the user must build x64 at least the Geographic.lib library.
+
+MultiResHpx was built and tested in x64 with Visual Studio 2017 and a VS15 solution and project files
+are included in this distribution within the /platform directory. 
+
+To get started, after Geographic.lib has been built, modify the START_MultiResHealpix.bat file to update
+appropriate location of GeographicLib-1.51. Run START_MultiResHealpix.bat to properly load the VS15 
+solution file. 
+
+First build MultiResHpx, and if successful then build each of the accompanying Example projects that
+demonstrate how the various MultiResHpx Query's work as well as a few other features of MultiResHpx.

@@ -240,18 +240,18 @@ int main(int64 argc, char* argv[])
 		{
 			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].first.rec, m);
 			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].second.rec, m2);
-			std::cout << "\t#1 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "\tPoint #1 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
 			std::cout << "," << foundMeasurements[j].first.pt.phi << "," << foundMeasurements[j].first.pt.theta << ","
 				<< foundMeasurements[j].first.pt.phi / pi << "," << cos(foundMeasurements[j].first.pt.theta) << ","
 				<< foundMeasurements[j].first.rec << "\n";
-			std::cout << "\t#2 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m2.m);
+			std::cout << "\tPoint #2 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m2.m);
 			std::cout << "," << foundMeasurements[j].second.pt.phi << "," << foundMeasurements[j].second.pt.theta << ","
 				<< foundMeasurements[j].second.pt.phi / pi << "," << cos(foundMeasurements[j].second.pt.theta) << ","
 				<< foundMeasurements[j].second.rec << "\n";
-			std::cout << " Radial Distance Between: " <<
+			std::cout << "\tRadial Distance Between: " <<
 				RadialDist(pointing(foundMeasurements[j].first.pt.theta, foundMeasurements[j].first.pt.phi),
 					pointing(foundMeasurements[j].second.pt.theta, foundMeasurements[j].second.pt.phi))
-					<< "\n\n\n";
+					<< "\n\n";
 		}
 	}
 
