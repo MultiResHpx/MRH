@@ -137,7 +137,7 @@
     <ClCompile>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(GEOGRAPHICLIB_BASE)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GEOGRAPHICLIB_BASE)/include;$(MRH_BASE)/include/HEALPix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN64;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -153,21 +153,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\alloc_utils.h" />
-    <ClInclude Include="..\..\include\arr.h" />
     <ClInclude Include="..\..\include\array.h" />
     <ClInclude Include="..\..\include\array2d.h" />
-    <ClInclude Include="..\..\include\datatypes.h" />
-    <ClInclude Include="..\..\include\error_handling.h" />
-    <ClInclude Include="..\..\include\geom_utils.h" />
-    <ClInclude Include="..\..\include\healpix_base.h" />
     <ClInclude Include="..\..\include\healpix_custom.h" />
-    <ClInclude Include="..\..\include\healpix_data_io.h" />
-    <ClInclude Include="..\..\include\healpix_map.h" />
-    <ClInclude Include="..\..\include\healpix_map_fitsio.h" />
-    <ClInclude Include="..\..\include\healpix_tables.h" />
-    <ClInclude Include="..\..\include\lsconstants.h" />
-    <ClInclude Include="..\..\include\math_utils.h" />
     <ClInclude Include="..\..\include\MortonLQT.h" />
     <ClInclude Include="..\..\include\MultiResHpx.h" />
     <ClInclude Include="..\..\include\MultiResHpx_Map.h" />
@@ -175,31 +163,24 @@
     <ClInclude Include="..\..\include\numtraits.h" />
     <ClInclude Include="..\..\include\Point2D.h" />
     <ClInclude Include="..\..\include\point3d.h" />
-    <ClInclude Include="..\..\include\pointing.h" />
-    <ClInclude Include="..\..\include\rangeset.h" />
     <ClInclude Include="..\..\include\shareddata.h" />
-    <ClInclude Include="..\..\include\string_utils.h" />
     <ClInclude Include="..\..\include\tinyvector.h" />
-    <ClInclude Include="..\..\include\vec3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\error_handling.cc" />
-    <ClCompile Include="..\..\src\geom_utils.cc" />
-    <ClCompile Include="..\..\src\healpix_base.cc" />
+    <ClCompile Include="..\..\src\HEALPix\error_handling.cc" />
+    <ClCompile Include="..\..\src\HEALPix\geom_utils.cc" />
+    <ClCompile Include="..\..\src\HEALPix\healpix_base.cc" />
+    <ClCompile Include="..\..\src\HEALPix\healpix_map.cc" />
+    <ClCompile Include="..\..\src\HEALPix\healpix_tables.cc" />
+    <ClCompile Include="..\..\src\HEALPix\pointing.cc" />
+    <ClCompile Include="..\..\src\HEALPix\string_utils.cc" />
     <ClCompile Include="..\..\src\healpix_custom.cc" />
-    <ClCompile Include="..\..\src\healpix_map.cc" />
-    <ClCompile Include="..\..\src\healpix_tables.cc" />
     <ClCompile Include="..\..\src\MortonLQT.cc" />
     <ClCompile Include="..\..\src\MortonLQT64.cc" />
     <ClCompile Include="..\..\src\MultiResHpx.cc" />
     <ClCompile Include="..\..\src\MultiResHpx_Map.cc" />
     <ClCompile Include="..\..\src\MultiResHpx_tables.cc" />
     <ClCompile Include="..\..\src\Point2D.cc" />
-    <ClCompile Include="..\..\src\pointing.cc" />
-    <ClCompile Include="..\..\src\string_utils.cc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
