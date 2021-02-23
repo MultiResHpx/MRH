@@ -34,30 +34,29 @@ using namespace::std;
 typedef long long int64; typedef unsigned long long uint64;
 
 
-class DiscType
+class TwoPointType
 {
 public:
-	DiscType() { pt.phi = 0.0;pt.theta = 0.0;radius = 0.0; };
-	DiscType(pointing p, double r) { pt = p;radius = r; };
-	~DiscType() {};
-	pointing pt;
+	TwoPointType() { radius = 0.0; };
+	TwoPointType( double r) {radius = r; };
+	~TwoPointType() {};
 	double radius;
 };
 
-class Measurement 
+class Measurement
 {
 public:
-	Measurement(){rec = EMPTY;};
+	Measurement() { rec = EMPTY; };
 
-	~Measurement(){};
+	~Measurement() {};
 
 	bool equals(const Measurement &other);
-	
+
 	// Data
 	int64 rec; //unique record number of measurement
 	pointing pt; //spatial location of measurement
-	
-	int	data1; 
+
+	int	data1;
 	int data2;
 	int data3;
 	int data4;
@@ -68,12 +67,12 @@ public:
 	double val4;
 };
 
-inline bool Measurement::equals(const Measurement &other){
-	if ( this->rec == other.rec ) { return true; }
+inline bool Measurement::equals(const Measurement &other) {
+	if (this->rec == other.rec) { return true; }
 	return false;
 }
 
-void GenRandomData(int numPoints,std::vector<Measurement>& ms, double MIN_PHI, double MAX_PHI, double MIN_THETA, double MAX_THETA)
+void GenRandomData(int numPoints, std::vector<Measurement>& ms, double MIN_PHI, double MAX_PHI, double MIN_THETA, double MAX_THETA)
 {
 	// GIS Longitude (Phi) Range: [-180.0,+180.0] degrees, relative to Prime Meridian.
 	// GIS Latitude (Theta) Range: [-90.0,+90.0] degrees, relative to Equator.
@@ -84,24 +83,24 @@ void GenRandomData(int numPoints,std::vector<Measurement>& ms, double MIN_PHI, d
 	double MIN_DOUBLE = -9999.0; double MAX_DOUBLE = 9999.0;
 	ms.clear();
 	int64 recNum = 0;
-	for(int i = 0; i < numPoints; i++) {
+	for (int i = 0; i < numPoints; i++) {
 		Measurement m;
 		m.rec = recNum;
 
 		// Create random point location
 		m.pt.phi = MIN_PHI + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_PHI - MIN_PHI)));
 		m.pt.theta = MIN_THETA + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_THETA - MIN_THETA)));
-	
-		// Random measurement data to demonstrate use of user defined Measurement structure.
-		m.data1 = MIN_INT + static_cast <int> (rand()) /( static_cast <double> (RAND_MAX/(MAX_INT-MIN_INT)));
-		m.data2 = MIN_INT + static_cast <int> (rand()) /( static_cast <double> (RAND_MAX/(MAX_INT-MIN_INT)));
-		m.data3 = MIN_INT + static_cast <int> (rand()) /( static_cast <double> (RAND_MAX/(MAX_INT-MIN_INT)));
-		m.data4 = MIN_INT + static_cast <int> (rand()) /( static_cast <double> (RAND_MAX/(MAX_INT-MIN_INT)));
 
-		m.data1 = MIN_DOUBLE + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(MAX_DOUBLE-MIN_DOUBLE)));
-		m.data2 = MIN_DOUBLE + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(MAX_DOUBLE-MIN_DOUBLE)));
-		m.data3 = MIN_DOUBLE + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(MAX_DOUBLE-MIN_DOUBLE)));
-		m.data4 = MIN_DOUBLE + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(MAX_DOUBLE-MIN_DOUBLE)));
+		// Random measurement data to demonstrate use of user defined Measurement structure.
+		m.data1 = MIN_INT + static_cast <int> (rand()) / (static_cast <double> (RAND_MAX / (MAX_INT - MIN_INT)));
+		m.data2 = MIN_INT + static_cast <int> (rand()) / (static_cast <double> (RAND_MAX / (MAX_INT - MIN_INT)));
+		m.data3 = MIN_INT + static_cast <int> (rand()) / (static_cast <double> (RAND_MAX / (MAX_INT - MIN_INT)));
+		m.data4 = MIN_INT + static_cast <int> (rand()) / (static_cast <double> (RAND_MAX / (MAX_INT - MIN_INT)));
+
+		m.data1 = MIN_DOUBLE + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_DOUBLE - MIN_DOUBLE)));
+		m.data2 = MIN_DOUBLE + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_DOUBLE - MIN_DOUBLE)));
+		m.data3 = MIN_DOUBLE + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_DOUBLE - MIN_DOUBLE)));
+		m.data4 = MIN_DOUBLE + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_DOUBLE - MIN_DOUBLE)));
 
 		ms.push_back(m);
 
@@ -112,40 +111,18 @@ void GenRandomData(int numPoints,std::vector<Measurement>& ms, double MIN_PHI, d
 
 
 
-std::vector<DiscType> CreateRandomDiscQueries(int numqueries, double MIN_PHI, double MAX_PHI, double MIN_THETA, double MAX_THETA, double MIN_RAD, double MAX_RAD)
+std::vector<TwoPointType> CreateRandomTwoPointQueries(int numqueries, double MIN_RAD, double MAX_RAD)
 {
-	// GIS Longitude (Phi) Range: [-180.0,+180.0] degrees, relative to Prime Meridian.
-	// GIS Latitude (Theta) Range: [-90.0,+90.0] degrees, relative to Equator.
-	// HPX Longitude (Phi) Range: [0.0,360.0] degrees, relative to Prime Meridian and progressing East.
-	// HPX Colatitude (Theta) Range: [0.0,180.0] degrees, relative to North Pole and progressing South to
-	// South Pole.
-	std::vector<DiscType> _discs;
-	DiscType nextDisc;
-	pointing pt;
-	bool validDisc = false;
+	std::vector<TwoPointType> _2pts;
+	TwoPointType next2pt;
 
 	for (int i = 0; i < numqueries; i++)
 	{
-		validDisc = false;
-		while (validDisc == false) {
-			// Generate random query center location in HPX Coordinate System
-			nextDisc.pt.phi = MIN_PHI + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_PHI - MIN_PHI)));
-			nextDisc.pt.theta = MIN_THETA + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_THETA - MIN_THETA)));
-
-			// Generate random query radius, making sure radius doesn't sweep
-			// off of allowed latitude,longitude limits!
-			nextDisc.radius = MIN_RAD + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_RAD - MIN_RAD)));
-
-			if (nextDisc.pt.phi + nextDisc.radius < MAX_PHI  &&
-				nextDisc.pt.phi - nextDisc.radius > MIN_PHI  &&
-				nextDisc.pt.theta + nextDisc.radius < MAX_THETA  &&
-				nextDisc.pt.theta - nextDisc.radius > MIN_THETA ) {
-				validDisc = true;
-				_discs.push_back(nextDisc);
-			}
-		}
+			// Generate random query radius
+		next2pt.radius = MIN_RAD + static_cast <double> (rand()) / (static_cast <double> (RAND_MAX / (MAX_RAD - MIN_RAD)));
+		_2pts.push_back(next2pt);
 	}
-	return _discs;
+	return _2pts;
 }
 
 
@@ -155,11 +132,11 @@ int main(int64 argc, char* argv[])
 	int i;
 	double nPhi, nTheta, nRadius;
 	std::vector<Measurement> myMeasurements;
-	std::vector<Measurement> foundMeasurements;
-	std::vector< DiscType > Discs;
-	MortonNode m;
+	std::vector<pair<Measurement,Measurement>> foundMeasurements;
+	std::vector< TwoPointType > TwoPts;
+	MortonNode m,m2;
 	int NUMPOINTS, MAXDEPTH, NUMQUERIES;
-	double MIN_PHI, MAX_PHI, MIN_THETA, MAX_THETA,MIN_RAD,MAX_RAD;
+	double MIN_PHI, MAX_PHI, MIN_THETA, MAX_THETA, MIN_RAD, MAX_RAD;
 
 	srand(time(NULL));
 
@@ -171,17 +148,17 @@ int main(int64 argc, char* argv[])
 		std::cout << "Arg 1: Number of random data points to generate\n";
 		std::cout << "Arg 2,3: Min. and Max. HPX Longitude (Phi) Range: [0.0,360.0] degrees, relative to Prime Meridian and progressing East.\n";
 		std::cout << "Arg 4,5: Min. and Max. HPX Colatitude (Theta) Range: [0.0,180.0] degrees, relative to North Pole and progressing South to the South Pole.\n";
-		std::cout << "Arg 6,7: Min. and Max. Query Radii for Disc Queries in degrees.\n";
+		std::cout << "Arg 6,7: Min. and Max. Query Radii for Two Point Correlation Queries in degrees.\n";
 		std::cout << "Arg 8: Max. MRH Tree Depth (1-29)\n";
-		std::cout << "Arg 9: Number of Random Disc Queries\n\n";
+		std::cout << "Arg 9: Number of Random Two Point Corr. Queries\n\n";
 		std::cout << "To run Example.exe with 1000 random data points,\n";
 		std::cout << "in a range of 30-40 degrees HPX Phi,\n";
 		std::cout << "and in a range of 90-100 degrees HPX Theta,\n";
-		std::cout << "with disc query radius between 0.1 and 20.0 degrees,\n";
+		std::cout << "with two point corr. query radius between 0.1 and 20.0 degrees,\n";
 		std::cout << "at a maximum tree depth of 4 and query the\n";
-		std::cout << "MRH data structure with 5 random disc queries the user would type:\n\n";
+		std::cout << "MRH data structure with 5 random two point corr. queries the user would type:\n\n";
 		std::cout << "Example.exe 1000 30.0 40.0 90.0 100.0 0.1 20.0 4 5\n";
-		 
+
 		exit(1);
 	}
 	else
@@ -202,7 +179,7 @@ int main(int64 argc, char* argv[])
 
 	//Create some random "Measurement" data with random Lat. Long. point positions for MRH data structure
 	std::cout << "\nCreate some random ""Measurement"" data with random Lat. Long. point positions for MRH data structure.\n";
-	GenRandomData(NUMPOINTS, myMeasurements,MIN_PHI,MAX_PHI,MIN_THETA,MAX_THETA);
+	GenRandomData(NUMPOINTS, myMeasurements, MIN_PHI, MAX_PHI, MIN_THETA, MAX_THETA);
 
 	//Insert the Measurements into MRH data structure.
 	std::cout << "\nInsert the Measurements into MRH data structure.\n";
@@ -226,27 +203,37 @@ int main(int64 argc, char* argv[])
 		mMRH.PrintTreeAtIndex(i);
 	}
 
-	//Create list of random Disc queries
-	std::cout << "\nCreate list of random Disc queries\n";
-	Discs = CreateRandomDiscQueries(NUMQUERIES, MIN_PHI, MAX_PHI, MIN_THETA, MAX_THETA,MIN_RAD,MAX_RAD);
-	
-	//Run the Disc Queries the MRH data structure
-	std::cout << "\nRun the Disc Queries the MRH data structure.\n";
+	//Create list of random two point correlation queries
+	std::cout << "\nCreate list of random Two Point Correlation queries\n";
+	TwoPts = CreateRandomTwoPointQueries(NUMQUERIES, MIN_RAD, MAX_RAD);
+
+	//Run the Two Point Queries the MRH data structure
+	std::cout << "\nRun the Two Point Queries on the MRH data structure.\n";
 	for (i = 0; i < NUMQUERIES; i++)
 	{
+		std::cout << "\n\nTwo Point Corr. Query #" << i + 1 << " definition:\n";
+		std::cout << "Radius: " << TwoPts[i].radius << "\n\n";
+
 		// Report Disc Query Results
-		foundMeasurements = mMRH.QueryDisc(Discs[i].pt, Discs[i].radius);
-		std::cout << "\n\nDisc Query #" << i + 1 << " definition:\n";
-		std::cout << "Morton,Phi,Theta,P,Z,Radius: " << Discs[i].pt.phi << "," << Discs[i].pt.theta << ","
-			<< Discs[i].pt.phi / pi << "," << cos(Discs[i].pt.theta) << "," << Discs[i].radius << "\n\n";
-		std::cout << "Found Measurements: \n";
+		foundMeasurements = mMRH.TwoPointCorrBin(TwoPts[i].radius);
+
+		std::cout << "Found Measurement Pairs: \n";
 		for (unsigned int j = 0; j < foundMeasurements.size(); j++)
 		{
-			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].rec, m);
-			std::cout << "Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
-			std::cout << "," << foundMeasurements[j].pt.phi << "," << foundMeasurements[j].pt.theta << ","
-				<< foundMeasurements[j].pt.phi / pi << "," << cos(foundMeasurements[j].pt.theta) << ","
-				<< foundMeasurements[j].rec << "\n";
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].first.rec, m);
+			mMRH.GetMortonNodeAtDataIndex(foundMeasurements[j].second.rec, m2);
+			std::cout << "\t#1 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m.m);
+			std::cout << "," << foundMeasurements[j].first.pt.phi << "," << foundMeasurements[j].first.pt.theta << ","
+				<< foundMeasurements[j].first.pt.phi / pi << "," << cos(foundMeasurements[j].first.pt.theta) << ","
+				<< foundMeasurements[j].first.rec << "\n";
+			std::cout << "\t#2 Morton,Phi,Theta,P,Z,Rec: "; PrintMorton(m2.m);
+			std::cout << "," << foundMeasurements[j].second.pt.phi << "," << foundMeasurements[j].second.pt.theta << ","
+				<< foundMeasurements[j].second.pt.phi / pi << "," << cos(foundMeasurements[j].second.pt.theta) << ","
+				<< foundMeasurements[j].second.rec << "\n";
+			std::cout << " Radial Distance Between: " <<
+				RadialDist(pointing(foundMeasurements[j].first.pt.theta, foundMeasurements[j].first.pt.phi),
+					pointing(foundMeasurements[j].second.pt.theta, foundMeasurements[j].second.pt.phi))
+					<< "\n\n\n";
 		}
 	}
 

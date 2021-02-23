@@ -13,7 +13,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleStripQuery", "Exampl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleNeighborQuery", "ExampleNeighborQuery\ExampleNeighborQuery.vcxproj", "{25D8D19D-1EF8-43CD-8538-EDAC42ED641D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleNearestNeighbor", "ExampleNearestNeighbor\ExampleNearestNeighbor.vcxproj", "{93E79862-971E-43F8-94CC-7A1124375085}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleNearestNeighborQuery", "ExampleNearestNeighbor\ExampleNearestNeighbor.vcxproj", "{93E79862-971E-43F8-94CC-7A1124375085}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleTwoPointCorrQuery", "ExampleTwoPointCorrQuery\ExampleTwoPointCorrQuery.vcxproj", "{DD4D0F92-6431-4556-B1E2-97F212B29D07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{93E79862-971E-43F8-94CC-7A1124375085}.Release|Win32.Build.0 = Release|Win32
 		{93E79862-971E-43F8-94CC-7A1124375085}.Release|x64.ActiveCfg = Release|x64
 		{93E79862-971E-43F8-94CC-7A1124375085}.Release|x64.Build.0 = Release|x64
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Debug|Win32.Build.0 = Debug|Win32
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Debug|x64.ActiveCfg = Debug|x64
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Debug|x64.Build.0 = Debug|x64
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|Win32.ActiveCfg = Release|Win32
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|Win32.Build.0 = Release|Win32
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|x64.ActiveCfg = Release|x64
+		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

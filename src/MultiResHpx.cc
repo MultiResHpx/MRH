@@ -378,7 +378,6 @@ bool IsMapIndexInList
 	for(unsigned int i = 0; i < list.size(); i++ ) {
 		// If duplicate data index node is already in the list
 		if( list[i].data[0] == node.data[0] )  {
-			//cout << "	FOUND! " << list[i].data[0] << " " << node.data[0] << endl;
 			return true;
 		}
 	}
@@ -391,15 +390,20 @@ bool IsMortonNodePairInList
  pair<MortonNode,MortonNode> nPair
 )
 {
-	for(unsigned int i = 0; i < list.size(); i++ ) {
-
-		// Must check for reverse pair order:
-		// (x,y) == (y,x)
-		if( Equals(list[i].first.m,nPair.first.m ) && Equals(list[i].second.m,nPair.second.m) ||
-			Equals(list[i].second.m,nPair.first.m ) && Equals(list[i].first.m,nPair.second.m) ) {
+	for(unsigned int i = 0; i < list.size(); i++ ) 
+	{
+		// Check for:
+		// (x,y) == (x,y)
+		if ( Equals(list[i].first.m, nPair.first.m) && Equals(list[i].second.m, nPair.second.m))
+		{
 			return true;
 		}
-
+		// Check for reverse pair order:
+		// (x,y) == (y,x)
+		if( Equals(list[i].first.m,nPair.second.m ) && Equals(list[i].second.m,nPair.first.m) ) 
+		{
+			return true;
+		}
 	}
 	return false;
 }
@@ -1715,11 +1719,14 @@ std::vector<std::pair<MortonNode,MortonNode>> MultiResHpx::_twopointcorrbin_inte
 	found.clear();
 	MortonNode nextNode;
 	pointing pt;
+	unsigned int i, j, k;
+	pairs.clear();
+
 	// Loop through each MortonLQT
-	for( int i = 0; i < 12; i++) {
+	for( i = 0; i < 12; i++) {
 
 		// Loop through each MortonLQT Node, checking for data points
-		for( int j = 0; j < forest_[i].GetNumMortonNodes(); j++) {
+		for( j = 0; j < forest_[i].GetNumMortonNodes(); j++) {
 			nextNode = forest_[i].GetNodeAtIndex(j);
 
 			// Check for data point
@@ -1728,24 +1735,39 @@ std::vector<std::pair<MortonNode,MortonNode>> MultiResHpx::_twopointcorrbin_inte
 				// Do QueryDisc from this data point
 				pt.phi = nextNode.phi;
 				pt.theta = nextNode.theta;
+
 				found = QueryDisc(pt,radius);
 
 				// Create found pairs
-				for(unsigned int k = 0; k < found.size(); k++) {
+				for( k = 0; k < found.size(); k++) {
 
-					// Skip the query point matching with itself in found
-					// disc query points.
-					if( !Equals(nextNode.m,found[k].m) )
+					// Check for data point
+					if (found[k].data.size() > 0)
 					{
-						foundPair.first = nextNode;
-						foundPair.second = found[k];
+						// Skip the query point matching with itself in found
+						// disc query points.
+						if (Equals(nextNode.m, found[k].m))
+						{
+							continue;
+						}
+						else
+						{
+							foundPair.first = nextNode;
+							foundPair.second = found[k];
 
-						// Check that foundPair is unique!
-						if( !IsMortonNodePairInList(pairs,foundPair) ) {
-							pairs.push_back(foundPair);
+							// Check that foundPair is unique!
+							if (IsMortonNodePairInList(pairs, foundPair))
+							{
+								continue;
+							}
+							else
+							{
+								pairs.push_back(foundPair);
+							}
 						}
 					}
 				}
+				found.clear();
 			}
 		}
 	}

@@ -105,7 +105,6 @@ void GenRandomData(int numPoints, std::vector<Measurement>& ms, double MIN_PHI, 
 
 		ms.push_back(m);
 
-
 		recNum += 1;
 	}
 }
@@ -147,24 +146,21 @@ int main(int64 argc, char* argv[])
 	srand(time(NULL));
 
 	// Parse command line arguments: num data points, max tree depth, num queries
-	if (argc != 10)
+	if (argc != 8)
 	{
 		// Print out command line instructions
 		std::cout << "\n*** Example.exe Usage ***\n\n";
 		std::cout << "Arg 1: Number of random data points to generate\n";
 		std::cout << "Arg 2,3: Min. and Max. HPX Longitude (Phi) Range: [0.0,360.0] degrees, relative to Prime Meridian and progressing East.\n";
 		std::cout << "Arg 4,5: Min. and Max. HPX Colatitude (Theta) Range: [0.0,180.0] degrees, relative to North Pole and progressing South to the South Pole.\n";
-		std::cout << "Arg 6,7: Min. and Max. Query Radii for Disc Queries in degrees.\n";
-		std::cout << "Arg 8: Max. MRH Tree Depth (1-29)\n";
-		std::cout << "Arg 9: Number of Random Disc & Polygon Queries\n\n";
+		std::cout << "Arg 6: Max. MRH Tree Depth (1-29)\n";
+		std::cout << "Arg 7: Number of Random Strip Queries\n\n";
 		std::cout << "To run Example.exe with 1000 random data points,\n";
 		std::cout << "in a range of 30-40 degrees HPX Phi,\n";
-		std::cout << "and in a range of 90-100 degrees HPX Theta,";
-		std::cout << "with disc query radius between 0.1 and 20.0 degrees,";
+		std::cout << "and in a range of 90-100 degrees HPX Theta,\n";
 		std::cout << "at a maximum tree depth of 4 and query the\n";
-		std::cout << "MRH data structure with 5 random disc and polygon\n";
-		std::cout << "queries the user would type:\n\n";
-		std::cout << "Example.exe 1000 30.0 40.0 90.0 100.0 0.1 20.0 4 5\n";
+		std::cout << "MRH data structure with 5 random strip queries the user would type:\n\n";
+		std::cout << "Example.exe 1000 30.0 40.0 90.0 100.0 4 5\n";
 
 		exit(1);
 	}
@@ -175,15 +171,11 @@ int main(int64 argc, char* argv[])
 		MAX_PHI = atof(argv[3])*D2R;
 		MIN_THETA = atof(argv[4])*D2R;
 		MAX_THETA = atof(argv[5])*D2R;
-		MIN_RAD = atof(argv[6])*D2R;
-		MAX_RAD = atof(argv[7])*D2R;
-		MAXDEPTH = atoi(argv[8]);
-		NUMQUERIES = atoi(argv[9]);
+		MAXDEPTH = atoi(argv[6]);
+		NUMQUERIES = atoi(argv[7]);
 	}
-	NEIGHBOR_QUERY_RESOLUTION = int(MAXDEPTH / 2);
 
 	MultiResHpx_Map<Measurement> mMRH(MAXDEPTH, NEST);
-
 
 	//Create some random "Measurement" data with random Lat. Long. point positions for MRH data structure
 	std::cout << "\nCreate some random ""Measurement"" data with random Lat. Long. point positions for MRH data structure.\n";
@@ -211,8 +203,8 @@ int main(int64 argc, char* argv[])
 		mMRH.PrintTreeAtIndex(i);
 	}
 
-	//Create list of random Disc, Convex Polygon, Strip and Neighbor queries
-	std::cout << "\nCreate list of random Disc and Polygon queries\n";
+	//Create list of random Strip queries
+	std::cout << "\nCreate list of random Strip Queries\n";
 	Strips = CreateRandomStripQueries(NUMQUERIES, MIN_THETA, MAX_THETA);
 
 	//Run the Strip Queries on the MRH data structure
