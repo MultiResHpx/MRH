@@ -78,9 +78,6 @@ MultiResHpx::MultiResHpx
 	max_tree_depth = Max_Depth;
 	num_rec = 0;
 	search_sentinel = 0;
-#ifdef UPSEARCHCOUNT
-    ResetCritCount();
-#endif
 }
 
 
@@ -131,144 +128,6 @@ void HpxPZCellBoundaries(pair<int64,int> hpxid,int step)
 	cout << p*pi << "," << acos(out[0].z) << "," << p << "," << out[0].z << endl; 
 }
 
-// Point In Polygon Test adapted from JavaScript version posted on Stackoverflow
-// March 9, 2013 8:02 by Elliot Winkler:
-// http://stackoverflow.com/questions/1119627/how-to-test-if-a-point-is-inside-of-a-convex-polygon-in-2d-integer-coordinates
-// Downloaded on June 5, 2015
-//
-
-std::vector<double> nsub(std::vector<double> v1, std::vector<double> v2) {
-	std::vector<double> v3(2);
-	v3[0] = v1[0]-v2[0];
-	v3[1] = v1[1]-v2[1];
-	return v3;
-}
-
-// aka the "scalar cross product"
-double perpdot(std::vector<double> v1, std::vector<double> v2) {
-  return v1[0]*v2[1] - v1[1]*v2[0];
-}
-
-// Determine if a point is inside a polygon.
-//
-// pointing pt - Coordinates of test point in HPX coordinate system, phi,theta.
-// vector<pointing> poly - Points that describe the vertices that make
-//             up the query polygon, in clockwise order around the polygon.
-//
-bool IsPointInPoly(pointing pt,std::vector<pointing> poly) 
-{
-  int i,j;
-  int len = poly.size();
-  std::vector<double> v1(2);
-  std::vector<double> v2(2);
-  std::vector<double> edge(2);
-  double x;
-  std::vector<double> nPolyPoint(2);
-  std::vector<double> tPoint(2);
-  tPoint[0] = pt.phi;
-  tPoint[1] = pt.theta;
-  // First translate the polygon so that `point` is the origin. Then, for each
-  // edge, get the angle between two vectors: 1) the edge vector and 2) the
-  // vector of the first vertex of the edge. If all of the angles are the same
-  // sign (which is negative since they will be counter-clockwise) then the
-  // point is inside the polygon; otherwise, the point is outside.
-  for (i = 0; i < len; i++) {
-    nPolyPoint[0] = poly[i].phi;
-	nPolyPoint[1] = poly[i].theta;
-    v1 = nsub(nPolyPoint, tPoint);
-	j = (i+1 > len-1 ? 0 : i + 1);
-    nPolyPoint[0] = poly[j].phi; 
-	nPolyPoint[1] = poly[j].theta; 
-    v2 = nsub(nPolyPoint, tPoint);
-    edge = nsub(v1, v2);
-    // Note that we could also do this by using the normal + dot product
-    x = perpdot(edge, v1);
-    // If the point lies directly on an edge then count it as in the polygon
-    if (x < 0) { return false; }
-  }
-  return true;
-}
-
-bool my_equals(double a,double b) {
-	double EPS = 0.00000000001;
-	if( fabs(a-b) < EPS ) {
-		return true;
-	}
-	return false;
-}
-
-bool pointing_equals(pointing a, pointing b) {
-	double EPS = 0.0000000000001;
-	if( fabs(a.phi-b.phi) < EPS &&
-		fabs(a.theta-b.theta) < EPS ) {
-			return true;
-	}
-	return false;
-}
-
-bool IsPointInPoly3(pointing pt,std::vector<pointing> poly)
-{
-	int i,n;
-	bool inside;
-	pointing p1,p2;
-	double p1x,p1y,p2x,p2y,xints;
-	// check if point is a vertex
-	for( i = 0; i < poly.size(); i++)
-	{
-		if( pointing_equals(pt,poly[i]) ) {
-			return true;
-		}
-	}
-
-	// check if point is on a boundary
-	for( i=0; i < poly.size(); i++) {
-		if( i == 0 ) {
-			p1 = poly[0];
-			p2 = poly[1];
-		}
-		else {
-			p1 = poly[i-1];
-			p2 = poly[i];
-		}
-
-		if( my_equals(p1.phi,p2.phi) &&
-			my_equals(p1.phi,pt.phi) &&
-			pt.theta > min(p1.theta,p2.theta) &&
-			pt.theta < max(p1.theta,p2.theta) ) {
-				return true;
-		}
-	}
-
-	n = poly.size();
-	inside = false;
-
-	p1x = poly[0].theta;
-	p1y = poly[0].phi;
-
-	for(i = 0; i < n+1; i++) {
-		p2x = poly[i%n].theta;
-		p2y = poly[i%n].phi;
-		if( pt.phi > min(p1y,p2y) ) {
-			if( pt.phi <= max(p1y,p2y) ) {
-				if( pt.theta <= max(p1x,p2x) ) {
-					if( !my_equals(p1y,p2y) ) {
-						xints = (pt.phi-p1y)*(p2x-p1x)/(p2y-p1y)+p1x;
-					}
-					if( my_equals(p1x,p2x) || pt.theta <= xints ) {
-						inside = !inside;
-					}
-				}
-			}
-		}
-		p1x = p2x;
-		p1y = p2y;
-	}
-	if( inside == true ) {
-		return true;
-	}
-	return false;
-}
-
 bool IsPointInPoly2(pointing pt,std::vector<pointing> poly)
 {
 	double X_MAX = twopi;
@@ -315,31 +174,6 @@ bool IsPointInPoly2(pointing pt,std::vector<pointing> poly)
 		return false;
 }
 
-// Implemented: 11DEC2015
-// Source: http://gis.stackexchange.com/questions/147629/testing-if-a-geodesic-polygon-contains-a-point-c
-// Is p0 inside p?  Polygon 
-bool inside(const pointing p0, const std::vector<pointing>& p) {
-  size_t n = p.size();
-  bool result = false;
-  for (size_t i = 0; i < n; ++i) {
-    size_t j = (i + 1) % n;
-    if (
-        // Does p0.y lies in half open y range of edge.
-        // N.B., horizontal edges never contribute
-        ( (p[j].theta <= p0.theta && p0.theta < p[i].theta) || 
-          (p[i].theta <= p0.theta && p0.theta < p[j].theta) ) &&
-        // is p to the left of edge?
-        ( p0.phi < p[j].phi + (p[i].phi - p[j].phi) * (p0.theta - p[j].theta) /
-          (p[i].theta - p[j].theta) )
-        )
-      result = !result;
-  }
-  return result;
-}
-
-
-
-
 
 bool IsPointInStrip(double theta1, double theta2, pointing pt) {
 
@@ -364,44 +198,6 @@ bool IsPointInDisc(pointing center,double radius,pointing pt) {
 }
 
 
-bool IsMapIndexInList
-(
- std::vector<MortonNode> list,
- MortonNode node
-)
-{
-	// Do Linear search if list size is relatively "small", quicker
-	// than binary search for "small" lists. Otherwise, do binary search
-	// for larger lists.
-	if( list.size() > 50 ) {
-
-		int min = 0;
-		int max = list.size()-1;
-		int mid = max / 2;
-
-		while ( min <= max ) {
-			mid = (int) ((min+max)/2);
-			if( node.data[0] < list[mid].data[0]  ) {
-				max = mid - 1;
-			}
-			else if ( node.data[0] > list[mid].data[0]  ) {
-				min = mid + 1;
-			}
-			else {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	for(unsigned int i = 0; i < list.size(); i++ ) {
-		// If duplicate data index node is already in the list
-		if( list[i].data[0] == node.data[0] )  {
-			return true;
-		}
-	}
-	return false;
-}
 
 bool IsMortonNodePairInList
 (
@@ -609,44 +405,6 @@ double MultiResHpx::AvgDepthAtMLQ(int idx)
 	return forest_[idx].GetAvgMortonTreeDepth();
 }
 
-int MultiResHpx::GetUpSearchCount()
-{
-	return UPSEARCH_COUNT;
-}
-
-void MultiResHpx::ResetUpSearchCount()
-{
-	UPSEARCH_COUNT = 0;
-}
-
-void MultiResHpx::ResetCritCount()
-{
-	lowHPX.ResetCritCount();
-	for( int i = 0; i < 12; i++ )
-	{
-		forest_[i].ResetCritCount();
-	}
-	MRH_CRIT_COUNT = 0;
-}
-
-int MultiResHpx::GetCritCount()
-{
-	int TOTAL_CRIT_COUNT = 0;
-
-	// First get critical section count from MortonLQTs
-	for( int i = 0; i < 12; i++ ) {
-		TOTAL_CRIT_COUNT += forest_[i].GetCritCount();
-	}
-
-	// Next get critical section count from healpix_base
-	TOTAL_CRIT_COUNT += lowHPX.GetCritCount();
-
-	// Lastly add critical section count from within MultiResHpx
-	TOTAL_CRIT_COUNT += MRH_CRIT_COUNT;
-
-	// Return total critical section count
-	return TOTAL_CRIT_COUNT;
-}
 
 int MultiResHpx::GetCoverMapSize()
 {
@@ -656,40 +414,6 @@ int MultiResHpx::GetCoverMapSize()
 int MultiResHpx::GetCoverMapCellRes()
 {
 	return MRH_COVER_MAP_CELL_RES;
-}
-
-//Inputs: pt, pointing angle = HPX phi(phi)(radians), HPX theta (theta) (radians), reference index to data item
-//        data_idx, external reference index to data location.
-//        If used in conjunction with MultiResHpx_Map, data_idx is the
-//        std::vector<T> index of the element.
-void MultiResHpx::Insert2(pointing pt, int64 data_idx)
-{
-	// GIS Longitude Range: [-180.0,+180.0] degrees, relative to Prime Meridian.
-	// GIS Latitude Range: [-90.0,+90.0] degrees, relative to Equator.
-	// HPX Longitude Range: [0.0,360.0] degrees, relative to Prime Meridian and progressing East.
-	// HPX Colatitude Range: [0.0,180.0] degrees, relative to North Pole and progressing South to
-	// South Pole. Input units must be RADIANS.
-	int fn;
-	std::vector<int64> data_indices;
-	data_indices.push_back(data_idx);
-
-	// Determine which face number (fn) HPX Longitude,Colatitude pair map to.
-	fn = hpxQ.FaceNum(pt);
-
-	// Create new Morton Node to be inserted based on its phi & theta
-	MortonNode new_node;
-	new_node.m = PhiThetaToMorton(pt.phi,pt.theta,max_tree_depth);
-	new_node.phi = pt.phi;
-	new_node.theta = pt.theta;
-	new_node.data.push_back(data_idx);
-	new_node.childrenYN = 0;
-
-	// Append new Morton Node to appropriate tree
-	forest_[fn].AddMortonNode2(new_node);
-
-	// Keep count of total number of records inserted into MRH.
-	num_rec++;
-
 }
 
 
@@ -1410,8 +1134,6 @@ std::vector<MortonNode> MultiResHpx::QueryPolygon
 }
 
 
-
-
 std::vector<MortonNode> MultiResHpx::QueryStrip 
 ( 
  double theta1, 
@@ -1791,64 +1513,6 @@ std::vector<std::pair<MortonNode,MortonNode>> MultiResHpx::_twopointcorrbin_inte
 		}
 	}
 	return pairs;
-}
-
-
-
-void MultiResHpx::BuildForest()
-{
-	unsigned int i,j,pIdx;
-	bool done;
-	Morton mMorton;
-	MortonNode mNode;
-
-	// For each Base MortonLQT
-	for( i = 0; i < 12; i++ ) {
-		
-		// For each MortonNode
-		for( j = 0; j < forest_[i].GetNumMortonNodes(); j++ ) {
-			done = false;
-			mNode = forest_[i].GetNodeAtIndex(j);
-			while( !done ) {
-				// Check for parent MortonNode
-				mMorton = ParentOfMorton(mNode.m);
-
-				pIdx = forest_[i].FindIndexAtMorton(mMorton);
-
-				// If no parent found, create parent MortonNode, mark
-				// as NOT having children and append to MortonLQT[i]
-				if( pIdx == -1 ) {
-					MortonNode mParent;
-					mParent.m = mMorton;
-					mParent.childrenYN = 0;
-					forest_[i].AddMortonNode2(mParent);
-					
-					// Check for next Parent if not at lowest level
-					if( mNode.m.LEVEL > 1 ) {
-						mNode.m = mMorton;
-					} else {
-						done = true;
-					}
-				}
-				else {
-					// Otherwise mark parent MortonNode as having children
-					// done = true
-					mNode = forest_[i].GetNodeAtIndex(pIdx);
-					mNode.childrenYN = 1;
-					done = true;
-					forest_[i].UpdateMortonNode(mNode);
-				}
-			}
-		}
-	}
-}
-
-void MultiResHpx::BuildForestFromArchive(ifstream& fp)
-{
-	for(unsigned int i = 0; i < 12; i++)
-	{
-		forest_[i].LoadTreeFromFile(fp);
-	}
 }
 
 // Given a data index from MultiResHpx_Map, find and return the stored MortonNode

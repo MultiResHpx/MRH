@@ -186,7 +186,7 @@ int main(int64 argc, char* argv[])
 	if (argc != 10)
 	{
 		// Print out command line instructions
-		std::cout << "\n*** Example.exe Usage ***\n\n";
+		std::cout << "\n*** ExampleDiscQuery.exe Usage ***\n\n";
 		std::cout << "Arg 1: Number of random data points to generate\n";
 		std::cout << "Arg 2,3: Min. and Max. HPX Longitude (Phi) Range: [0.0,360.0] degrees, relative to Prime Meridian and progressing East.\n";
 		std::cout << "Arg 4,5: Min. and Max. HPX Colatitude (Theta) Range: [0.0,180.0] degrees, relative to North Pole and progressing South to the South Pole.\n";

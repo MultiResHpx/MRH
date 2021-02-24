@@ -153,18 +153,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\array.h" />
-    <ClInclude Include="..\..\include\array2d.h" />
     <ClInclude Include="..\..\include\healpix_custom.h" />
     <ClInclude Include="..\..\include\MortonLQT.h" />
     <ClInclude Include="..\..\include\MultiResHpx.h" />
     <ClInclude Include="..\..\include\MultiResHpx_Map.h" />
     <ClInclude Include="..\..\include\MultiResHpx_tables.h" />
-    <ClInclude Include="..\..\include\numtraits.h" />
-    <ClInclude Include="..\..\include\Point2D.h" />
-    <ClInclude Include="..\..\include\point3d.h" />
-    <ClInclude Include="..\..\include\shareddata.h" />
-    <ClInclude Include="..\..\include\tinyvector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\HEALPix\error_handling.cc" />
@@ -180,7 +173,6 @@
     <ClCompile Include="..\..\src\MultiResHpx.cc" />
     <ClCompile Include="..\..\src\MultiResHpx_Map.cc" />
     <ClCompile Include="..\..\src\MultiResHpx_tables.cc" />
-    <ClCompile Include="..\..\src\Point2D.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

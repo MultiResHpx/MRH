@@ -19,13 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\Example.cpp" />
+    <ClCompile Include="..\..\..\src\Examples\ExampleDiscQuery.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{EF64C4E0-84DF-48DD-8331-34C950A6418F}</ProjectGuid>
     <RootNamespace>Example</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>ExampleDiscQuery</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -81,7 +82,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(GEOGRAPHICLIB_BASE)/include;$(MRH_BASE)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GEOGRAPHICLIB_BASE)/include;$(MRH_BASE)/include;$(MRH_BASE)/include/HEALPix</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

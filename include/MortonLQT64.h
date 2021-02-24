@@ -25,16 +25,9 @@
 using namespace::std;
 
 //GLOBALS
-//#define MAXDEPTH 13 //32BIT machines
-//#define MAXDEPTH 29 //64BIT machines
-//#define SIBLINGNODES 
-//#define MLQT_VERBOSE 
 #define R2D 57.29577951308
 #define D2R  0.01745329252
 
-#define WORDMETHOD
-//#define CRITCOUNT
-//#define BENCHMARKING
 
 const double cos45 = cos(degr2rad*45.0);
 
@@ -215,8 +208,6 @@ public:
 	//// GET, APPEND, ADD INSERT NODE 
 
 	MortonNode GetNodeAtIndex(unsigned int index);
-
-	//std::vector<MortonNode> GetClosestMortonNodeAtPhiTheta(pointing pt);
 
 	std::vector<MortonNode> GetNodeAtMorton(Morton m,int sub);
 	    

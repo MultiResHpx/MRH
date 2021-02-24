@@ -30,14 +30,6 @@
 #define MAX_NSIDE_32 8192
 #define MAX_NSIDE_64 536870912
 
-//#define CRITCOUNT
-//#define UPSEARCHCOUNT
-
-//#define MRH_VERBOSE 
-
-//#define HPX_COVERAGE_MAP
-//#define HPX_COVERAGE_MAP_CELL_COUNT
-
 #include "math.h"
 
 
@@ -45,7 +37,6 @@
 #include "healpix_custom.h"
 #include "healpix_base.h"
 #include "geom_utils.h"
-//#include "MortonLQT.h"
 #include "MortonLQT64.h"
 #include "MultiResHpx_tables.h"
 
@@ -60,14 +51,9 @@ pointing HPXtoGIS(pointing pt);
 pointing GIStoHPX(pointing pt);
 pointing RADECtoHPX(pointing pt);
 pointing HPXtoRADEC(pointing pt);
-bool my_equals(double a,double b);
-bool pointing_equals(pointing a, pointing b);
-bool IsPointInPoly(pointing pt,std::vector<pointing> poly); 
 bool IsPointInPoly2(pointing pt,std::vector<pointing> poly);
-bool IsPointInPoly3(pointing pt,std::vector<pointing> poly);
 bool IsPointInStrip(double theta1, double theta2, pointing pt);
 bool IsPointInDisc(pointing center,double radius,pointing pt);
-double ComputeArcLengthBetween(pointing pt1, pointing pt2);
 void HpxPZCellBoundaries(pair<int64,int> hpxid,int step);
 double RadialDist(pointing pt1,pointing pt2);
 void Vec2ang(vec3 vec,pointing &ang);
@@ -81,17 +67,7 @@ public:
 	MultiResHpx( int Max_Depth, Healpix_Ordering_Scheme scheme );
 	~MultiResHpx();
 
-	// Accessors
-	const int& emptyValue( int fn ) const;
-
-
-	// Mutators
-
 	// Utilities
-	void NormGIStoHPX(double phi, double theta,pointing &ptg,int& fn);
-	void DenormHPXtoGIS(double phi, double theta,pointing &ptg,int& fn);
-	//void ShiftAngleGIStoHPX(pointing &ptg,double dir);
-	//void ShiftAngleBase0toBaseN(int fn, pointing &ptg,double dir);
 	void PrintTreeAtIndex(int fn);
 	void PrintListAtIndex(int fn);
 	void Delete(pointing pt);
@@ -100,30 +76,16 @@ public:
 	int LoadFromFile(std::string filename);
  
 
-	// Indexing operators
-	//std::vector<Point2D> operator() ( pointing pt );
-	//std::vector<Point2D> operator() ( std::vector<int> mrh );
-	//std::vector<Point2D> At( pointing pt );
-	//std::vector<Point2D> At( std::vector<int> mrh )const;
 
 	//// Setters
 	void Insert (pointing pt, int64 mapidx);
-	void Insert2 (pointing pt, int64 mapidx);
 	void SetMaxDepth(int maxDepth);
-
-	// Build the MortonLQT Forest
-	void BuildForest();
-
-	void BuildForestFromArchive(ifstream& fp);
 
 	//// Getters
 	bool GetMortonNodeAtDataIndex(int64 qidx, MortonNode& foundM);
 	bool GetMortonNodeAtMorton(Morton qm, MortonNode& foundM);
 
 	vector< MortonLQT > GetForest();
-
-	//int getBytesAtFace(int fn) { return forest_[fn].bytes(); }
-	//inline int size();
 
     //// Translators & Conversions 
 
@@ -265,15 +227,10 @@ public:
 	int DepthAtMLQ(int);
 	double AvgDepthAtMLQ(int);
 	int GetTreeDepthLimit();
-	int GetCritCount();
 	int GetCoverMapSize();
 	int GetCoverMapCellRes();
-	void ResetCritCount();
 	std::vector<int> GetNodeSizeHistogram();
 
-
-	int GetUpSearchCount();
-	void ResetUpSearchCount();
 
 protected:
 
@@ -289,12 +246,9 @@ private:
 	Healpix_Custom hpxQ;
 	Healpix_Base lowHPX;
 	int search_sentinel; 
-	std::vector<double> HpxCellRadiusTable;
-	int MRH_CRIT_COUNT;
 	int MRH_COVER_MAP_SIZE;
 	int MRH_COVER_MAP_CELL_RES;
-	int MRH_UPSEARCH_COUNT;
-    int UPSEARCH_COUNT;
+
 };
 
 

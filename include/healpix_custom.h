@@ -21,9 +21,6 @@
 */
 
 #include "healpix_base.h"
-#include "array.h"
-
-#define DEBUG false
 
 using namespace std;
 

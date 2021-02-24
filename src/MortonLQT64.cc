@@ -51,138 +51,24 @@ void PrintMorton(Morton m)
 bool GreaterThan(Morton a, Morton b)
 {
 
-#ifdef WORDMETHOD
 	uint64 mA = GetMortonWord(a);
 	uint64 mB = GetMortonWord(b);
 	return mA > mB;
-#else
-	if( a.LEVEL > b.LEVEL ) { 
-		return true; 
-	} else if( a.LEVEL < b.LEVEL ) {
-		return false;
-	} else { // a and b are same level so now must compare each Morton Bit.
-		// Compare bit level by bit level. Return once an equality is discovered.
-		if ( a.L1 > b.L1 ) { return true; } else if ( a.L1 < b.L1 ) { return false; }
-		if ( a.L2 > b.L2 ) { return true; } else if ( a.L2 < b.L2 ) { return false; }
-		if ( a.L3 > b.L3 ) { return true; } else if ( a.L3 < b.L3 ) { return false; }
-		if ( a.L4 > b.L4 ) { return true; } else if ( a.L4 < b.L4 ) { return false; }
-		if ( a.L5 > b.L5 ) { return true; } else if ( a.L5 < b.L5 ) { return false; }
-		if ( a.L6 > b.L6 ) { return true; } else if ( a.L6 < b.L6 ) { return false; }
-		if ( a.L7 > b.L7 ) { return true; } else if ( a.L7 < b.L7 ) { return false; }
-		if ( a.L8 > b.L8 ) { return true; } else if ( a.L8 < b.L8 ) { return false; }
-		if ( a.L9 > b.L9 ) { return true; } else if ( a.L9 < b.L9 ) { return false; }
-		if ( a.L10 > b.L10 ) { return true; } else if ( a.L10 < b.L10 ) { return false; }
-		if ( a.L11 > b.L11 ) { return true; } else if ( a.L11 < b.L11 ) { return false; }
-		if ( a.L12 > b.L12 ) { return true; } else if ( a.L12 < b.L12 ) { return false; }
-		if ( a.L13 > b.L13 ) { return true; } else if ( a.L13 < b.L13 ) { return false; }
-		if ( a.L14 > b.L14 ) { return true; } else if ( a.L14 < b.L14 ) { return false; }
-		if ( a.L15 > b.L15 ) { return true; } else if ( a.L15 < b.L15 ) { return false; }
-		if ( a.L16 > b.L16 ) { return true; } else if ( a.L16 < b.L16 ) { return false; }
-		if ( a.L17 > b.L17 ) { return true; } else if ( a.L17 < b.L17 ) { return false; }
-		if ( a.L18 > b.L18 ) { return true; } else if ( a.L18 < b.L18 ) { return false; }
-		if ( a.L19 > b.L19 ) { return true; } else if ( a.L19 < b.L19 ) { return false; }
-		if ( a.L20 > b.L20 ) { return true; } else if ( a.L20 < b.L20 ) { return false; }
-		if ( a.L21 > b.L21 ) { return true; } else if ( a.L21 < b.L21 ) { return false; }
-		if ( a.L22 > b.L22 ) { return true; } else if ( a.L22 < b.L22 ) { return false; }
-		if ( a.L23 > b.L23 ) { return true; } else if ( a.L23 < b.L23 ) { return false; }
-		if ( a.L24 > b.L24 ) { return true; } else if ( a.L24 < b.L24 ) { return false; }
-		if ( a.L25 > b.L25 ) { return true; } else if ( a.L25 < b.L25 ) { return false; }
-		if ( a.L26 > b.L26 ) { return true; } else if ( a.L26 < b.L26 ) { return false; }
-		if ( a.L27 > b.L27 ) { return true; } else if ( a.L27 < b.L27 ) { return false; }
-		if ( a.L28 > b.L28 ) { return true; } else if ( a.L28 < b.L28 ) { return false; }
-		if ( a.L29 > b.L29 ) { return true; } else if ( a.L29 < b.L29 ) { return false; }
-		return false; //If made it here, a and b are EQUAL!
-	}
-#endif
 }
 
 
 bool LessThan(Morton a, Morton b)
 {
-#ifdef WORDMETHOD
 	uint64 mA = GetMortonWord(a);
 	uint64 mB = GetMortonWord(b);
 	return mA < mB;
-#else
-	if( a.LEVEL < b.LEVEL ) { 
-		return true; 
-	} else if( a.LEVEL > b.LEVEL ) {
-		return false;
-	} else { // a and b are same level so now must compare each Morton Bit.
-		// Compare bit level by bit level. Return once an equality is discovered.
-		if ( a.L1 < b.L1 ) { return true; } else if ( a.L1 > b.L1 ) { return false; }
-		if ( a.L2 < b.L2 ) { return true; } else if ( a.L2 > b.L2 ) { return false; }
-		if ( a.L3 < b.L3 ) { return true; } else if ( a.L3 > b.L3 ) { return false; }
-		if ( a.L4 < b.L4 ) { return true; } else if ( a.L4 > b.L4 ) { return false; }
-		if ( a.L5 < b.L5 ) { return true; } else if ( a.L5 > b.L5 ) { return false; }
-		if ( a.L6 < b.L6 ) { return true; } else if ( a.L6 > b.L6 ) { return false; }
-		if ( a.L7 < b.L7 ) { return true; } else if ( a.L7 > b.L7 ) { return false; }
-		if ( a.L8 < b.L8 ) { return true; } else if ( a.L8 > b.L8 ) { return false; }
-		if ( a.L9 < b.L9 ) { return true; } else if ( a.L9 > b.L9 ) { return false; }
-		if ( a.L10 < b.L10 ) { return true; } else if ( a.L10 > b.L10 ) { return false; }
-		if ( a.L11 < b.L11 ) { return true; } else if ( a.L11 > b.L11 ) { return false; }
-		if ( a.L12 < b.L12 ) { return true; } else if ( a.L12 > b.L12 ) { return false; }
-		if ( a.L13 < b.L13 ) { return true; } else if ( a.L13 > b.L13 ) { return false; }
-		if ( a.L14 < b.L14 ) { return true; } else if ( a.L14 > b.L14 ) { return false; }
-		if ( a.L15 < b.L15 ) { return true; } else if ( a.L15 > b.L15 ) { return false; }
-		if ( a.L16 < b.L16 ) { return true; } else if ( a.L16 > b.L16 ) { return false; }
-		if ( a.L17 < b.L17 ) { return true; } else if ( a.L17 > b.L17 ) { return false; }
-		if ( a.L18 < b.L18 ) { return true; } else if ( a.L18 > b.L18 ) { return false; }
-		if ( a.L19 < b.L19 ) { return true; } else if ( a.L19 > b.L19 ) { return false; }
-		if ( a.L20 < b.L20 ) { return true; } else if ( a.L20 > b.L20 ) { return false; }
-		if ( a.L21 < b.L21 ) { return true; } else if ( a.L21 > b.L21 ) { return false; }
-		if ( a.L22 < b.L22 ) { return true; } else if ( a.L22 > b.L22 ) { return false; }
-		if ( a.L23 < b.L23 ) { return true; } else if ( a.L23 > b.L23 ) { return false; }
-		if ( a.L24 < b.L24 ) { return true; } else if ( a.L24 > b.L24 ) { return false; }
-		if ( a.L25 < b.L25 ) { return true; } else if ( a.L25 > b.L25 ) { return false; }
-		if ( a.L26 < b.L26 ) { return true; } else if ( a.L26 > b.L26 ) { return false; }
-		if ( a.L27 < b.L27 ) { return true; } else if ( a.L27 > b.L27 ) { return false; }
-		if ( a.L28 < b.L28 ) { return true; } else if ( a.L28 > b.L28 ) { return false; }
-		if ( a.L29 < b.L29 ) { return true; } else if ( a.L29 > b.L29 ) { return false; }
-		return false; //If made it here, a and b are EQUAL!
-	}
-#endif
 }
 
 bool Equals(Morton a, Morton b)
 {
-#ifdef WORDMETHOD
 	uint64 mA = GetMortonWord(a);
 	uint64 mB = GetMortonWord(b);
 	return mA == mB;
-#else
-   if( a.LEVEL != b.LEVEL ) return false;
-   if( a.L1 != b.L1 ) return false;
-   if( a.L2 != b.L2 ) return false;
-   if( a.L3 != b.L3 ) return false;
-   if( a.L4 != b.L4 ) return false;
-   if( a.L5 != b.L5 ) return false;
-   if( a.L6 != b.L6 ) return false;
-   if( a.L7 != b.L7 ) return false;
-   if( a.L8 != b.L8 ) return false;
-   if( a.L9 != b.L9 ) return false;
-   if( a.L10 != b.L10 ) return false;
-   if( a.L11 != b.L11 ) return false;
-   if( a.L12 != b.L12 ) return false;
-   if( a.L13 != b.L13 ) return false;
-   if( a.L14 != b.L14 ) return false;
-   if( a.L15 != b.L15 ) return false;
-   if( a.L16 != b.L16 ) return false;
-   if( a.L17 != b.L17 ) return false;
-   if( a.L18 != b.L18 ) return false;
-   if( a.L19 != b.L19 ) return false;
-   if( a.L20 != b.L20 ) return false;
-   if( a.L21 != b.L21 ) return false;
-   if( a.L22 != b.L22 ) return false;
-   if( a.L23 != b.L23 ) return false;
-   if( a.L24 != b.L24 ) return false;
-   if( a.L25 != b.L25 ) return false;
-   if( a.L26 != b.L26 ) return false;
-   if( a.L27 != b.L27 ) return false;
-   if( a.L28 != b.L28 ) return false;
-   if( a.L29 != b.L29 ) return false;
-   return true;
-#endif
 }
 
 
@@ -695,9 +581,6 @@ public:
     HasPackedId(Morton m,int sub) : _m(m),_sub(sub) {}
     bool operator()(const MortonNode & o) const {
         return ( o.m == _m && o.sub == _sub );
-    //HasId(int m) : _m(m) {}
-    //bool operator()(const MortonNode & o) const {
-    //    return o.m == _m;
     }
 };
 
@@ -837,7 +720,6 @@ void MortonLQT::SetFaceNum(int face_num)
 
 int MortonLQT::FindIndexAtMorton(Morton m)
 {
-  //return( FindIndexAtMortonSub_internal(m,1) );
   return( FindIndexAtMortonSub_BinarySearch_internal(m,1) );
 }
 
@@ -893,9 +775,6 @@ int MortonLQT::FindIndexAtMortonSub_BinarySearch_internal(Morton sMorton, int sS
 				return mid;
 			}
 		}
-#ifdef CRITCOUNT
-	CRIT_COUNT += 1;
-#endif
 	}
 	return -1;
 }
@@ -1053,8 +932,6 @@ Morton MortonLQT::FindMortonAtPhiTheta(pointing pt)
 	}
 	return( m );
 }
-
-
 
 
 MortonNode MortonLQT::GetNodeAtIndex(unsigned int index)
@@ -1231,7 +1108,6 @@ void MortonLQT::AddMortonNode2(MortonNode node)
 	new_node.sentinel = node.sentinel;
 	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
-
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton2);
 }
@@ -1349,13 +1225,6 @@ Morton MortonLQT::InsertMortonNode_internal_1(pointing pt,std::vector<int64> dat
               // Re-calculate next level deeper Morton code for Morton Node to be inserted. 
               treeDepth += 1;
 
-			  // !!!!BENCHMARKING MODIFICATION!!! 
-			  // If there is a node insertion collision:
-			  // 1) If the new node phi and theta values matche EXACTLY with current node we'll simply overwrite
-			  //    the current node's data index with new node's data index.
-			  // 2) If the new node is mapped to same Morton Code as current node AND we're at the maximum level
-			  //    of resolution we'll simply overwrite the current node with new node.
-
 			  if( abs_approx(node[0].phi,insert_node.phi) && abs_approx(node[0].theta,insert_node.theta) ) {
 					node[0].data.push_back(insert_node.data[0]);
 					UpdateMortonNode(node[0]);
@@ -1468,52 +1337,52 @@ void MortonLQT::SaveTreeToFile(ofstream& fp)
 void MortonLQT::LoadTreeFromFile(ifstream& fp)
 {
 	int numNodes, nodeNumber, sub, num_data_indices, facenum;
-	  int64 next_data;
-	  std::string m;
-	  int childrenYN;
-	  double phi,theta;
-	  std::string temp;
+	int64 next_data;
+	std::string m;
+	int childrenYN;
+	double phi,theta;
+	std::string temp;
           
-      // Reset current tree
-      mTree.clear();    
+    // Reset current tree
+    mTree.clear();    
 
-	  // First line is Base Number, skip
-      skip_line(fp);
+	// First line is Base Number, skip
+    skip_line(fp);
 
-      // Next line is number of records
-	  fp >> temp >> numNodes;  skip_line(fp);
+    // Next line is number of records
+	fp >> temp >> numNodes;  skip_line(fp);
 
-      // Skip header line
+    // Skip header line
+	skip_line(fp);
+
+    // Next lines are data records (the nodes of the tree)
+    for(int i = 0; i < numNodes; i++)
+	{
+      MortonNode next_node;
+
+	  fp >> nodeNumber >> facenum >> m >> sub >> childrenYN >> phi >> theta;
+		 
+	  next_node.m = StringToMorton(m);
+      next_node.sub = sub;
+	  next_node.childrenYN = childrenYN;
+      next_node.phi = phi;
+      next_node.theta = theta;
+	  next_node.facenum = facenum;
+
+	  // Now read in count of data indices mapped to this record
+	  fp >> num_data_indices;
+		 
+	  for(int j = 0; j < num_data_indices; j++) {
+		fp >> next_data;
+		next_node.data.push_back(next_data);
+      }
+
+	  // Skip the rest of the line
 	  skip_line(fp);
 
-      // Next lines are data records (the nodes of the tree)
-      for(int i = 0; i < numNodes; i++)
-	  {
-       	 MortonNode next_node;
 
-	     fp >> nodeNumber >> facenum >> m >> sub >> childrenYN >> phi >> theta;
-		 
-		 next_node.m = StringToMorton(m);
-         next_node.sub = sub;
-		 next_node.childrenYN = childrenYN;
-         next_node.phi = phi;
-         next_node.theta = theta;
-		 next_node.facenum = facenum;
-
-		 // Now read in count of data indices mapped to this record
-		 fp >> num_data_indices;
-		 
-		 for(int j = 0; j < num_data_indices; j++) {
-			fp >> next_data;
-			next_node.data.push_back(next_data);
-         }
-
-		 // Skip the rest of the line
-		 skip_line(fp);
-
-
-         mTree.push_back(next_node);
-	  }
+      mTree.push_back(next_node);
+	}
 }
 
 void MortonLQT::WriteHeader(ofstream& fp)

@@ -40,9 +40,6 @@
 using namespace::std;
 
 //GLOBALS
-//#define MAXDEPTH 13 //32BIT machines
-//#define MAXDEPTH 29 //64BIT machines
-#define VERBOSE true
 #define R2D 57.29577951308
 #define D2R  0.01745329252
    
@@ -50,11 +47,9 @@ using namespace::std;
 const double NegSin45 = sin(-45.0*D2R);
 const double NegCos45 = cos(-45.0*D2R);
 const double initLeft = 0.0;
-//const double initRight = (D2R*90.0) / sqrt(2.0);
 const double initRight = (sqrt(2.0)/4.0)*pi;
 const double initTop = 0.0;
 const double initBottom = (sqrt(2.0)/4.0)*pi;
-//const double initBottom = (D2R*90.0) / sqrt(2.0);
 
 class MortonNode 
 {
@@ -71,8 +66,6 @@ public:
 	float latitude;
 	int data;
 	int facenum;
-
-
 };
 
 
@@ -159,9 +152,8 @@ private:
 	void SearchMortonNode_internal(std::vector<MortonNode>& found_nodes,int64 morton, int sub);
 	int64 InsertNode_internal_1(float longitude,float latitude,int data);
 	int FindIndexAtMortonSub_internal(int64 sMorton, int sSubs);
-   void WriteHeader(FILE* fp);
+    void WriteHeader(FILE* fp);
 	void WriteData(FILE* fp);
-
 
 // Attributes
 private:
@@ -169,8 +161,6 @@ private:
 	int userMaxDepth;
 	int curTreeDepth;
 	Healpix_Custom hpxQ;
-
-
 };
 
 

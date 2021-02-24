@@ -265,10 +265,7 @@ int64 MortonLQT::GetBitMask(int order)
 
 int64 MortonLQT::HpxToMorton(int64 hpxid,int order)
 {
-	if(VERBOSE)
-	{
-	  cout << "Input: hpxid = " << hpxid << " of order " << order << endl;
-	}
+
 	int64 morton = 0;
 	int64 mask = 0;
 	int64 nextBit = 0;
@@ -276,9 +273,7 @@ int64 MortonLQT::HpxToMorton(int64 hpxid,int order)
 	mask = 3 << ((2*order)-2); 
 	for(int i = order; i > 0; i--)  
 	{
-	  if(VERBOSE) cout << "  mask #" << i <<": " << mask << endl;
 	  nextBit = ((hpxid & mask) >> ((2*i)-2) ) + 1; 
-	  if(VERBOSE)  cout << "     value: " << nextBit << endl;
 	  morton = AppendMortonBit(morton,nextBit);
 	  mask = mask >> 2; 
 	}
@@ -289,20 +284,15 @@ int64 MortonLQT::HpxToMorton(int64 hpxid,int order)
 void MortonLQT::MortonToHpx(int64 morton,int64& hpxid, int& order)
 {
 	int nextBit = 0;
-	if(VERBOSE) cout << "Input: Morton = " << morton << endl;
 	order = GetMortonLevel(morton);
-	if(VERBOSE) printf("  Order: %d\n",order);
 	hpxid = 0;
 	int temp = 0;
 	int shift = 0;
 	for(int i = 0; i < order; i++)
 	{
 	  nextBit = GetMortonBit(morton,order-i)-1;
-	  if(VERBOSE) cout << "  Morton digit #" << i << ": " << nextBit << endl;
 	  nextBit = nextBit << shift; 
-	  if(VERBOSE) cout << "  after shift: " << nextBit << endl;
 	  hpxid += nextBit;  
-	  if(VERBOSE) cout << "hpxid " << hpxid << endl;
 	  shift += 2;
 	}
 }
@@ -320,7 +310,6 @@ int64 MortonLQT::LongLatToMorton(float longHpx,float coLatHpx,int order)
    hpxQ.Set(order,NEST);
    int64 hpxId = hpxQ.ang2pix(pt);
    int64 morton = HpxToMorton(hpxId,order);
-	if (VERBOSE) cout << "HpxId: " << hpxId << " Order: " << order << " Morton: " << morton << endl;
    return morton;
 }
 
@@ -334,7 +323,6 @@ void MortonLQT::MortonToLongLat(int64 morton,float& longHpx, float& coLatHpx)
    pt = hpxQ.pix2ang(hpxId);
    longHpx = pt.phi;
    coLatHpx = pt.theta;
-   if(VERBOSE) cout << "LongHpx: " << pt.phi << " CoLatHpx: " << pt.theta << endl;
 }
 
 // Given list of candidate data nodes (all have Morton Code that maps to longitude,latitude)
@@ -614,16 +602,6 @@ void MortonLQT::UpdateNode(MortonNode node)
 		mTree[index].latitude = node.latitude;
 		mTree[index].data = node.data;
 		mTree[index].facenum = node.facenum;
-		if(VERBOSE)
-		{
-			cout << "Updated node: " << mTree[index].facenum << " "
-									  << mTree[index].morton << " "
-				                      << mTree[index].sub << " "
-											 << mTree[index].childrenYN << " "
-											 << mTree[index].longitude << " "
-											 << mTree[index].latitude << " "
-											 << mTree[index].data << endl;
-		}
 	}
 }
 
@@ -647,16 +625,6 @@ void MortonLQT::AppendNode(MortonNode node)
 	new_node.data = node.data;
 	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
-	if(VERBOSE)
-	{
-		cout << "Append duplicate new node: " << new_node.facenum << " "
-														  << new_node.morton << " "
-														  << new_node.sub << " "
-														  << new_node.childrenYN << " "
-														  << new_node.longitude << " "
-													     << new_node.latitude << " "
-												 	     << new_node.data << endl;   
-	}
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton);
 }
@@ -672,62 +640,15 @@ void MortonLQT::AddNode(MortonNode node)
 	new_node.data = node.data;
 	new_node.facenum = node.facenum;
 	mTree.push_back(new_node);
-	if(VERBOSE)
-	{
-		cout << "Added new node: " << new_node.facenum << " "
-									<< new_node.morton << " "
-											<< new_node.sub << " "
-											<<	new_node.childrenYN << " "
-											<< new_node.longitude << " "
-											<< new_node.latitude << " "
-											<< new_node.data << endl;
-	}
 	// Now must add the other sibling nodes at same level of quad tree
 	std::vector<int64> siblings = SiblingsOfMorton(node.morton);     
-	if(VERBOSE)
-	{
-		cout << "Create siblings of " << node.morton << " "
-												<< siblings[0] << " "
-												<< siblings[1] << " "
-												<< siblings[2] << endl;
-	}
 	MortonNode empty_node;
 	empty_node.morton = siblings[0];
 	mTree.push_back(empty_node);
-	if(VERBOSE)
-	{
-		cout << "Added sibling node: " << empty_node.facenum << " "
-										<< empty_node.morton << " "
-												 << empty_node.sub << " "
-												 << empty_node.childrenYN << " "
-												 << empty_node.longitude << " "
-												 << empty_node.latitude << " "
-												 << empty_node.data << endl;
-	}
 	empty_node.morton = siblings[1];
 	mTree.push_back(empty_node);
-	if(VERBOSE)
-	{
-		cout << "Added sibling node: " << empty_node.facenum << " "
-												<< empty_node.morton << " "
-												 << empty_node.sub << " "
-												 << empty_node.childrenYN << " "
-												 << empty_node.longitude << " "
-												 << empty_node.latitude << " "
-												 << empty_node.data << endl;
-	}
 	empty_node.morton = siblings[2];
 	mTree.push_back(empty_node);
-	if(VERBOSE)
-	{
-		cout << "Added sibling node: " << empty_node.facenum << " "
-												<< empty_node.morton << " "
-												 << empty_node.sub << " "
-												 << empty_node.childrenYN << " "
-												 << empty_node.longitude << " "
-												 << empty_node.latitude << " "
-												 << empty_node.data << endl;
-	}
 	// Sort the tree
 	std::sort( mTree.begin(), mTree.end(), SortFunctionMorton);
 
@@ -802,18 +723,10 @@ int64 MortonLQT::InsertNode_internal_1(float longitude,float latitude,int data)
        // Morton node with data
        if( node.size() > 0 )
 		 {
-         if(VERBOSE)
-			{
-           cout << "Morton Node " << node[0].morton << " found!" << endl;
-			}
          // If Morton node has children then need to re-calculate Morton
          // code of node to be inserted to next level deeper.
          if( node[0].childrenYN == 1 )
 			{
-            if(VERBOSE)
-			   {
-               cout << "Found Morton Node " << node[0].morton << " has children." << endl;
-			   }
             treeDepth += 1;
             new_morton = LongLatToMorton(longitude,latitude,treeDepth);
             insert_node.morton = new_morton;  
@@ -825,10 +738,6 @@ int64 MortonLQT::InsertNode_internal_1(float longitude,float latitude,int data)
             // we have a node insertion collision!
             if( node[0].data != -1 )
 			   {
-              if(VERBOSE)
-				  {
-                cout << "Collision! Morton Node " << node[0].morton << " already has data: " << node[0].data << endl;
-				  }
               // Store collided Morton Node's information for re-insertion
               longitude_save = node[0].longitude;
               latitude_save = node[0].latitude;
@@ -842,11 +751,6 @@ int64 MortonLQT::InsertNode_internal_1(float longitude,float latitude,int data)
               // If so will create a NEW Node with SAME Morton Code and add to the tree.
               if( treeDepth > userMaxDepth )
 				  {
-                 if(VERBOSE)
-					  {
-                    cout << "Reached Max Tree Depth: Append Node with identical Morton Code: " << insert_node.morton << endl;
-                    cout << "Specify deeper Max Tree Depth!" << endl;
-					  }
                  AppendNode(insert_node);
                  done = true;
 			     }
@@ -867,20 +771,12 @@ int64 MortonLQT::InsertNode_internal_1(float longitude,float latitude,int data)
                    insert_node.latitude = latitude_save;
                    insert_node.childrenYN = childrenYN_save;
                    insert_node.data = data_save;
-                   if(VERBOSE)
-					    {
-                      cout << "Now re-insert the collided node with data " << data_save << " to " << new_morton << endl;
-					    }
 				  }
 			   }
             // Otherwise no insertion collision so update the data,longitude,latitude,etc
             // attributes of MortonNode.
             else
 			   {
-              if(VERBOSE)
-				  {
-                cout << "No insertion collision found, updating Morton Node: " << node[0].morton << " with " << insert_node.data << endl;
-				  }
               UpdateNode(insert_node);
               if( treeDepth > curTreeDepth )
 				  {
@@ -892,10 +788,6 @@ int64 MortonLQT::InsertNode_internal_1(float longitude,float latitude,int data)
 		 }            
        else
 		 {
-         if(VERBOSE)
-		   {
-           cout << "Morton Node " << insert_node.morton << " not found, Adding new Morton Node!" << endl;
-			}
          // If Morton code not found in list then append it to the end
          // of the Morton list then sort the list ascending by Morton code
          AddNode(insert_node);
@@ -930,12 +822,6 @@ void MortonLQT::DeleteMortonNodeAtMorton(int64 morton,int sub)
 	if( index == -1 )
 	{
 		return;
-	}
-	if(VERBOSE)
-	{
-	   cout << "DeleteNodeAtMorton: " << morton << " "
-			                            << sub << " "
-												 << index << endl;
 	}
 	// Remove the node from the tree
 	mTree.erase(mTree.begin()+index);

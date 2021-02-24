@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleNearestNeighborQuery
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleTwoPointCorrQuery", "ExampleTwoPointCorrQuery\ExampleTwoPointCorrQuery.vcxproj", "{DD4D0F92-6431-4556-B1E2-97F212B29D07}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example", "ExampleDiscQuery\Example.vcxproj", "{EF64C4E0-84DF-48DD-8331-34C950A6418F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -81,6 +83,14 @@ Global
 		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|Win32.Build.0 = Release|Win32
 		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|x64.ActiveCfg = Release|x64
 		{DD4D0F92-6431-4556-B1E2-97F212B29D07}.Release|x64.Build.0 = Release|x64
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Debug|Win32.Build.0 = Debug|Win32
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Debug|x64.ActiveCfg = Debug|x64
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Debug|x64.Build.0 = Debug|x64
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Release|Win32.ActiveCfg = Release|Win32
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Release|Win32.Build.0 = Release|Win32
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Release|x64.ActiveCfg = Release|x64
+		{EF64C4E0-84DF-48DD-8331-34C950A6418F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
