@@ -1,5 +1,5 @@
-# Baseline Version 1.0
-Baseline version of Multi-Resolution HEALPix (MRH). This version was implemented as part of the Computer Science Dissertation, "Multi-Resolution Data Structures for Spherically Mapped Point Data". 2017.
+# Multi-Resolution HEALPix, MultiResHpx, or MRH
+This version was implemented as part of the Computer Science Dissertation, "Multi-Resolution Data Structures for Spherically Mapped Point Data". 2017.
 
 Dissertation Abstract:
 
