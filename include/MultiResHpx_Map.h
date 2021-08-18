@@ -21,6 +21,8 @@
 */
 
 #include "MultiResHpx.h"
+#include "healpix_map.h"
+
 
 /*! A MultiResHpx map of a given datatype */
 template<typename T> class MultiResHpx_Map: public MultiResHpx
@@ -86,6 +88,9 @@ template<typename T> class MultiResHpx_Map: public MultiResHpx
 	std::vector<T> NearNeighbors(int data_idx);
 
     std::vector<pair<T,T>> TwoPointCorrBin( double radius );
+
+	/*! Healpix_Map to MultiResHpx_Map Conversion */
+	bool HPXMap_to_MRHMap(Healpix_Map<T> mHPX);
 
 };
 
@@ -317,4 +322,37 @@ template<typename T> std::vector<pair<T,T>> MultiResHpx_Map<T>::TwoPointCorrBin(
 	}
 	return foundTT;
 }
+
+
+/*! Healpix_Map to MultiResHpx_Map Conversion 
+    Converts a HEALPIX Map data structure into a MRH data structure
+	by recursively analyzing leaf node siblings and reducing resulting leaf
+	depth if simplifying is possible i.e. if all sibling leaf nodes contain same
+	value (or within some user defined tolerence) for user defined parameter within
+	T then they all can be eliminated and parent node set to that value. Resulting
+	MRH data structure should be a tree that has been minimized with respect to leaf
+	node depth.
+*/
+template<typename T> bool  MultiResHpx_Map<T>::HPXMap_to_MRHMap(Healpix_Map<T> mHPX)
+{
+	// Step 1: Create MultiResHpx_Map of equivalent depth of input Healpix_Map
+
+	// Step 2: Populate MultiResHpx_Map leaf nodes with respective leaf nodes of input Healpix_Map
+
+	// Step 3: Loop until "Done"
+
+	//   Step 3A: Get next set of sibling nodes at current maximum tree depth
+
+	//   Step 3B: IF all FOUR sibling node's referenced T records have the same value for a user
+	//            specified parameter (or within some defined tolerence) then set the parent
+	//            node's user specified parameter in the referenced T record to the value contained
+	//            in all FOUR it's children nodes. Then, delete the FOUR sibling nodes from the MultiResHpx_Map.
+	//
+	//            ELSE, continue to next set of sibling nodes at current maximum tree depth
+
+	//    Step 3C: IF no more sets of sibling nodes at current depth, decrease search depth by one.
+	//             IF new tree depth is the root node, set "Done" to true.
+}
+
+
 #endif
